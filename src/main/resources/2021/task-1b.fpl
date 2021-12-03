@@ -1,0 +1,34 @@
+
+; You have to increase the stack size of JVM: -Xss10m
+
+
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-1.txt") "\\r?\\n" 0))
+
+(def list-of-numbers (map (lambda (x) (parse-number "#" "US" x)) list-of-strings)) 
+
+(def-function sliding-window-3 (values)
+	(if-else (ge (size values) 3)
+		(add-front
+			 (+ 
+				(get-element values 0)
+				(get-element values 1)
+				(get-element values 2)
+			 )
+		     (sliding-window-3 (remove-first values)))
+		'() 
+	) 
+)
+
+(last (reduce 
+	(lambda (acc value)
+		(put last-value (first acc))
+		(def sum (last acc))
+		(if-else (and last-value (gt value last-value))
+			(list value (+ 1 sum))
+			(list value sum)
+		)
+	) 
+	'(nil 0)
+	(sliding-window-3 list-of-numbers)
+	
+))
