@@ -16,25 +16,34 @@
 	)
 )
 
-(def horizontal-depth 
+(def horizontal-depth-aim 
 	(reduce 
 		(lambda (acc value)
 			(def command (first value))
 			(def parameter (last value))
 			(cond
 				(eq "forward" command)
-					(list (+ (first acc) parameter) (last acc))
+					(list 
+						(+ (first acc) parameter) 
+						(+ (get-element acc 1) (* (last acc) parameter)) 
+						(last acc))
 				(eq "down" command)
-					(list (first acc) (+ (last acc) parameter))
+					(list 
+						(first acc) 
+						(get-element acc 1) 
+						(+ (get-element acc 2) parameter))
 				(eq "up" command)
-					(list (first acc) (- (last acc) parameter))
+					(list 
+						(first acc) 
+						(get-element acc 1) 
+						(- (get-element acc 2) parameter))
 			)
 		)
-		'(0 0 0) ; (horizontal depth)
+		'(0 0 0) ; (horizontal depth aim)
 		list-of-commands
 	)
 )
 
-(* (first horizontal-depth) (last horizontal-depth))
+(* (first horizontal-depth-aim) (get-element horizontal-depth-aim 1))
 
-; 1660158
+; 1604592846

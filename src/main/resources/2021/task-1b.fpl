@@ -32,3 +32,5 @@
 	(sliding-window-3 list-of-numbers)
 	
 ))
+
+; 1378
