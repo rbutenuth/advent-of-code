@@ -1,0 +1,38 @@
+
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-2.txt") "\\r?\\n" 0))
+
+; each command is a list of the command string followed by the number (command parameter)
+(def list-of-commands 
+	(map 
+		(lambda (x) 
+			(list
+			    (first (split x " " 0))
+		 		(parse-number "#" "US" 
+		 			(last (split x " " 0))
+		 		)
+		 	)
+		)
+		list-of-strings
+	)
+)
+
+(def horizontal-depth 
+	(reduce 
+		(lambda (acc value)
+			(def command (first value))
+			(def parameter (last value))
+			(cond
+				(eq "forward" command)
+					(list (+ (first acc) parameter) (last acc))
+				(eq "down" command)
+					(list (first acc) (+ (last acc) parameter))
+				(eq "up" command)
+					(list (first acc) (- (last acc) parameter))
+			)
+		)
+		'(0 0) ; (horizontal depth)
+		list-of-commands
+	)
+)
+
+(* (first horizontal-depth) (last horizontal-depth))
