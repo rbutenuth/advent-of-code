@@ -6,5 +6,5 @@
 
 ![](https://img.shields.io/badge/days%20completed-2-red)
 
-My Solutions for the (https://adventofcode.com/2021/)[Advent of Code].
-Written in (https://github.com/rbutenuth/fpl)[FPL], my own Lisp dialect.
+My Solutions for the [Advent of Code](https://adventofcode.com/2021/).
+Written in [FPL](https://github.com/rbutenuth/fpl), my own Lisp dialect.
