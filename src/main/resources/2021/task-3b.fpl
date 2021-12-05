@@ -1,0 +1,81 @@
+
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-3.txt") "\\r?\\n" 0))
+
+(def zero (char-at "0" 0))
+(def one (char-at "1" 0))
+
+(def bits-in-input (length (first list-of-strings)))
+
+(def-function count-at-position (values position bit-as-utf-number)
+	(reduce
+		(lambda (acc value)
+			(+
+				acc
+				(if-else (eq bit-as-utf-number (char-at value position))
+					1
+					0
+				)
+			)
+		)
+		0
+		values
+	)
+)
+
+ 
+(def-function more-ones-than-zeros (values position)
+	(ge (count-at-position values position one) (count-at-position values position zero))
+)
+
+(def-function less-ones-than-zeros (values position)
+	(lt (count-at-position values position one) (count-at-position values position zero))
+)
+
+
+(def-function filter-list (values position bit-as-utf-number)
+	(filter 
+		(lambda (value)
+			(eq (char-at value position) bit-as-utf-number)
+		)
+		values
+	)
+)
+
+(def-function oxygen-rating-as-string (values position)
+	(if-else (eq 1 (size values))
+		(first values)
+		(if-else (more-ones-than-zeros values position)
+			(oxygen-rating-as-string (filter-list values position one) (+ position 1)) 
+			(oxygen-rating-as-string (filter-list values position zero) (+ position 1)) 
+		)
+	) 
+)
+
+(def-function co2-rating-as-string (values position)
+	(println values)
+	(if-else (eq 1 (size values))
+		(first values)
+		(if-else (less-ones-than-zeros values position)
+			(co2-rating-as-string (filter-list values position one) (+ position 1)) 
+			(co2-rating-as-string (filter-list values position zero) (+ position 1)) 
+		)
+	) 
+)
+
+(def-function binary-to-integer (str)
+	(if-else (eq 0 (length str))
+		0
+		(+
+			(* 2 (binary-to-integer (substring str 0 (- (length str) 1))))
+			(if-else (eq one (char-at str (- (length str) 1))) 1 0)
+		)
+	) 
+)
+
+(def oxygen-rating (binary-to-integer (oxygen-rating-as-string list-of-strings 0)))
+(def co2-rating (binary-to-integer (co2-rating-as-string list-of-strings 0)))
+
+(* oxygen-rating co2-rating)
+
+; 482500
+

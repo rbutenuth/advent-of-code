@@ -37,7 +37,7 @@
 		""
 		(join
 			(compute-gamma-rate values (- bits 1))
-			(if-else (gt (count-at-position values (- bits 1)) ( / (size list-of-strings) 2)) "1" "0")
+			(if-else (gt (count-at-position values (- bits 1)) ( / (size values) 2)) "1" "0")
 		)
 	)
 )
