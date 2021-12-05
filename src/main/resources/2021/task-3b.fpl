@@ -52,7 +52,6 @@
 )
 
 (def-function co2-rating-as-string (values position)
-	(println values)
 	(if-else (eq 1 (size values))
 		(first values)
 		(if-else (less-ones-than-zeros values position)
