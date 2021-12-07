@@ -1,0 +1,68 @@
+
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-5.txt") "\\r?\\n" 0))
+
+; 0,9 -> 5,9
+(def lines-of-vents
+	(map
+		(lambda (line)
+			(map
+				(lambda (str)
+					(parse-number "#" "US" str)
+				) 
+				(sub-list (match line "(\\d+),(\\d+) -> (\\d+),(\\d+)") 2 6)
+			)
+		)
+		list-of-strings
+	)
+)
+
+(def-function place-vent (d x y)
+	(def key (join x "-" y))
+	(put old-value (dict-get d key))
+	(if-else old-value
+		(dict-set d key (+ old-value 1))
+		(dict-def d key 1)
+	)
+)
+
+(def-function draw-line-of-vents (d line)
+	(def x1 (get-element line 0))
+	(def y1 (get-element line 1))
+	(def x2 (get-element line 2))
+	(def y2 (get-element line 3))
+	(if-else (eq x1 x2)
+		(from-to-inclusive
+			(lambda (i)
+				(place-vent d x1 i)
+			)
+			y1 y2 
+		)
+		(if (eq y1 y2)
+			(from-to-inclusive
+				(lambda (i)
+					(place-vent d i y1)
+				)
+				x1 x2 
+			)
+		)
+	)
+)
+
+(def seabed (dict))
+(for-each
+	(lambda (line)
+		(draw-line-of-vents seabed line)
+	)
+	lines-of-vents
+)
+
+(size
+	(filter
+		(lambda (no-of-vents)
+			(ge no-of-vents 2)
+		) 
+		(dict-values seabed)
+	)
+)
+
+; 6572
