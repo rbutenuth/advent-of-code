@@ -213,4 +213,6 @@
 (println "last drawn number: " number)
 (println "score of winning-board: " (score (get-element moving-boards winning-board)))
 
-(println "result: " (* number (score (get-element moving-boards winning-board))))  
+(println "result: " (* number (score (get-element moving-boards winning-board))))
+
+; 87456  

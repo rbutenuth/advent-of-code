@@ -1,0 +1,235 @@
+
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-4.txt") "\\r?\\n" 0))
+
+(def random-numbers 
+	(map 
+		(lambda (x) (parse-number "#" "US" x)) 
+		(split (first list-of-strings) "," 0)
+	)
+)
+
+; Adding an empty string at the end makes the boards uniform: Each ends with the empty string.
+(def list-of-board-strings (add-end (sub-list list-of-strings 2 (size list-of-strings)) ""))
+
+(def number-of-boards (/ (+ 1 (size list-of-board-strings)) 6))
+
+(def-function create-board (number strings)
+	(map
+		(lambda (x) (parse-number "#" "US" x))
+		(filter 
+			(lambda (x) (gt (length x) 0))
+			(flat-map
+				(lambda (x)
+					(split x " +" 0)
+				)
+				(sub-list strings (* number 6) (* (+ number 1) 6))
+			)
+		)
+	)
+)
+
+(def-function create-board-with-marks (number strings)
+	(map
+		(lambda (b) (list b 0))
+		(create-board number strings)
+	) 
+)
+
+(def list-of-boards '())
+(def counter 0)
+(while
+	(lt counter number-of-boards)
+	(set list-of-boards (add-end list-of-boards (create-board-with-marks counter list-of-board-strings)))
+	(set counter (+ counter 1))
+)
+(put counter nil)
+
+; The list-of-boards is complete, now start with functions which do the actual work.
+
+(def-function row-of-board (board index)
+	(sub-list board (* index 5) (* (+ index 1 ) 5)) 
+)
+
+(def-function col-of-board (board index)
+	(list
+		(get-element board (+ index 0))
+		(get-element board (+ index 5))
+		(get-element board (+ index 10))
+		(get-element board (+ index 15))
+		(get-element board (+ index 20))
+	) 
+)
+
+(def-function cell-to-string (cell)
+	(join
+		(format-number "00" "US" (first cell))
+		" "
+		(last cell)
+		" "
+	) 
+)
+
+(def-function row-to-string (row)
+	(reduce 
+		(lambda (acc cell)
+			(join 
+				acc 
+				(if-else acc " " "")
+				(cell-to-string cell) ) 
+		)
+		""
+		row
+	)
+)
+
+(def-function board-to-string (board)
+	(join
+ 		(row-to-string (row-of-board board 0)) "\r\n"
+		(row-to-string (row-of-board board 1)) "\r\n"
+		(row-to-string (row-of-board board 2)) "\r\n"
+		(row-to-string (row-of-board board 3)) "\r\n"
+		(row-to-string (row-of-board board 4)) "\r\n"
+	)
+)
+
+(def-function rows-of-board (board)
+	(list
+		(row-of-board board 0)
+		(row-of-board board 1)
+		(row-of-board board 2)
+		(row-of-board board 3)
+		(row-of-board board 4)
+	)
+)
+
+(def-function cols-of-board (board)
+	(list
+		(col-of-board board 0)
+		(col-of-board board 1)
+		(col-of-board board 2)
+		(col-of-board board 3)
+		(col-of-board board 4)
+	)
+)
+(def-function max (a b)
+	(if-else 
+		(gt a b)
+		a
+		b
+	)
+)
+
+(def-function marks-in-cells (cells)
+	(reduce
+		(lambda (acc cell) (+ acc (last cell)))
+		0
+		cells
+	)
+)
+
+(def-function max-marks-in-rows (board)
+	(reduce
+		(lambda (acc row) (max acc (marks-in-cells row)))
+		0
+		(rows-of-board board)
+	)
+)
+
+(def-function max-marks-in-cols (board)
+	(reduce
+		(lambda (acc col) (max acc (marks-in-cells col)))
+		0
+		(cols-of-board board)
+	)
+)
+
+(def-function wins (board)
+	(eq 5 
+		(max
+			(max-marks-in-rows board)
+			(max-marks-in-cols board)
+		)
+	)
+)
+
+(def-function apply-number (boards number)
+	(map 
+		(lambda (board) 
+			(map
+				(lambda (cell)
+					(if-else
+						(eq number (first cell))
+						(list (first cell) 1)
+						cell
+					)
+				) 
+				board
+			)
+		)
+		boards
+	)
+)
+
+(def-function contains (values value)
+	(reduce
+		(lambda (acc element)
+			(or acc (eq value element))
+		)
+		0
+		values
+	)
+)
+
+(def moving-boards list-of-boards)
+(def counter 0)
+(def number -1)
+(def winners '())
+
+(while
+	(lt (size winners) number-of-boards)
+	(set number (first random-numbers))
+
+	(println "number drawn: " number ", winners: " winners)
+
+	(set moving-boards (apply-number moving-boards number))
+	(set counter (+ counter 1))
+	(put board-index 0)
+	(while
+		(and (lt (size winners) number-of-boards) (lt board-index number-of-boards))
+		(if 
+			(and (not (contains winners board-index)) (wins (get-element moving-boards board-index)))
+			(sequential
+				(println "board " (+ board-index 1) " wins")
+				(put last-winning-board board-index)
+				(set winners (add-end winners board-index))
+				(put winning-board board-index)
+			)
+		) 
+		(set board-index (+ board-index 1))
+	)
+	(set random-numbers (remove-first random-numbers))
+)
+
+; (println (board-to-string (get-element moving-boards 0)))
+
+(def-function score (board)
+	(reduce
+		(lambda (acc cell)
+			(if-else 
+				(last cell)
+				acc ; cell is marked, do nothing
+				(+ acc (first cell)) ; cell is unmarked, add number
+			)
+		)
+		0
+		board
+	)
+)
+
+
+(println "last drawn number: " number)
+(println "score of winning-board: " (score (get-element moving-boards winning-board)))
+
+(println "result: " (* number (score (get-element moving-boards winning-board))))  
+
+; 15561
