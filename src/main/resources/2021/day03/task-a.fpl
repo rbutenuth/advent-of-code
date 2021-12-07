@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-3.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day03/task-input.txt") "\\r?\\n" 0))
 
 (def zero (char-at "0" 0))
 (def one (char-at "1" 0))

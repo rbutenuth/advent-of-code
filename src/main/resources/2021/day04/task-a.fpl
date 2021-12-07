@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-4.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day04/task-input.txt") "\\r?\\n" 0))
 
 (def random-numbers 
 	(map 

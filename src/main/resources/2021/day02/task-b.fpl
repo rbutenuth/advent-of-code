@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-2.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day02/task-input.txt") "\\r?\\n" 0))
 
 ; each command is a list of the command string followed by the number (command parameter)
 (def list-of-commands 

@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-5.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day05/task-input.txt") "\\r?\\n" 0))
 
 ; 0,9 -> 5,9
 (def lines-of-vents
@@ -31,33 +31,18 @@
 	(def x2 (get-element line 2))
 	(def y2 (get-element line 3))
 	(if-else (eq x1 x2)
-		; vertical
 		(from-to-inclusive
 			(lambda (i)
 				(place-vent d x1 i)
 			)
 			y1 y2 
 		)
-		(if-else (eq y1 y2)
-			; horizontal
+		(if (eq y1 y2)
 			(from-to-inclusive
 				(lambda (i)
 					(place-vent d i y1)
 				)
 				x1 x2 
-			)
-			; diagonal
-			(sequential
-				(def delta-y (if-else (gt y2 y1) 1 -1))
-				(def y y1)
-				(from-to-inclusive
-					(lambda (x)
-						(place-vent d x y)
-						(set y (+ y delta-y))
-					)
-					x1 x2 
-				)
-				
 			)
 		)
 	)
@@ -80,4 +65,4 @@
 	)
 )
 
-; 21466
+; 6572

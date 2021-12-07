@@ -1,6 +1,6 @@
 ; https://adventofcode.com/2021/day/1
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/task-input-1.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day01/task-input.txt") "\\r?\\n" 0))
 
 (def list-of-numbers (map (lambda (x) (parse-number "#" "US" x)) list-of-strings)) 
 
