@@ -1,0 +1,74 @@
+(def 
+	fish-timers 
+	(map
+		(lambda (str) (parse-number "#" "US" str)) 
+		(split (read-string-from-file "src/main/resources/2021/day06/task-input.txt") "," 0)
+	)
+)
+
+(def timers (dict 
+	"0" 0	
+	"1" 0	
+	"2" 0	
+	"3" 0	
+	"4" 0	
+	"5" 0	
+	"6" 0	
+	"7" 0	
+	"8" 0	
+))
+
+(def-function key (number)
+	(format-number "#" "US" number)
+)
+
+(for-each
+	(lambda (x)
+		(dict-set 
+			timers 
+			(key x)
+			(+ 1 (dict-get timers (key x))) 
+		) 
+	)
+	fish-timers 
+)
+
+; first element: Number of lanternfishes with timer 0
+; last element: Number of lanternfishes with timer 8
+(def timer-list (dict-values timers))
+
+; element 0 is old element 1 etc. up to element 5 (from old element 6) 
+; element 6 is old element 0 + old element 7
+; element 7 is old element 8
+; element 8 is old element 0
+(def-function next-generation (t)
+	(println "generation " t)
+	(list
+		(get-element t 1) ; 0
+		(get-element t 2)
+		(get-element t 3)
+		(get-element t 4)
+		(get-element t 5)
+		(get-element t 6) ; 5
+		(+ (first t) (get-element t 7)) ; 6
+		(get-element t 8) ; 7
+		(first t) ; 8
+	)
+)
+
+(from-to
+	(lambda (generation)
+		(set timer-list (next-generation timer-list))  
+	)
+	0
+	256
+)
+
+; Total number of fishes is the sum over the timer-list
+(reduce
+	(lambda (acc count) (+ acc count))
+	0
+	timer-list
+)
+
+; 1710623015163
