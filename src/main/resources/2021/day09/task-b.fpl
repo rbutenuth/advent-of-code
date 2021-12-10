@@ -1,0 +1,104 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day09/task-input.txt") "\\r?\\n" 0))
+
+(def cols (length (first list-of-strings)))
+(def rows (size list-of-strings))
+
+
+(def-function height (row col)
+	(if-else (or (lt row 0) (ge row rows))
+		10
+		(if-else (or (lt col 0) (ge col cols))
+			10
+			(- (char-at (get-element list-of-strings row) col) (char-at "0" 0))
+		)
+	)
+)
+
+(def-function is-low-point (row col)
+	(def h (height row col))
+	(and
+		(lt h (height (+ row 1) col))
+		(lt h (height (- row 1) col))
+		(lt h (height row (+ col 1)))
+		(lt h (height row (- col 1)))
+	)
+)
+
+(def low-points-and-nulls
+	(map-sequence
+		(lambda (row)
+			(map-sequence
+				(lambda (col)
+					(if-else (is-low-point row col)
+						(list row col)
+						nil
+					)
+				)
+				0
+				cols
+			)
+		)
+		0
+		rows
+	)
+)
+
+(def low-points
+	(filter 
+		(lambda (x) x)
+		(flat-map 
+			(lambda (x) x)
+			low-points-and-nulls
+		)
+	)
+)
+
+(def-function flood-fill (d row col)
+	(def key (join row "-" col))
+	(println "key: " key)
+	(if
+		(and
+			(lt (height row col) 9)
+			(not (dict-get d key))
+		)
+		(sequential
+			(dict-put d key 1)
+			(flood-fill d (+ row 1) col)
+			(flood-fill d (- row 1) col)
+			(flood-fill d row (+ col 1))
+			(flood-fill d row (- col 1))
+		)
+	) 
+)
+
+(def-function sort-descending (values)
+	(sort 
+		(lambda (a b)
+			(if-else (lt a b) 
+				1 
+				(if-else (gt a b) 
+					-1 
+					0
+				)
+			)
+		) 
+		values
+	)
+)
+
+(def sorted-sizes
+	(sort-descending
+		(map
+			(lambda (low-point)
+				(def filled (dict))
+				(flood-fill filled (first low-point) (last low-point))
+				(size (dict-keys filled))
+			) 
+			low-points
+		)
+	)
+)
+
+(* (get-element sorted-sizes 0) (get-element sorted-sizes 1) (get-element sorted-sizes 2))
+
+; 1019494
