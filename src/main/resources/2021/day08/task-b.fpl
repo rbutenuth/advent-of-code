@@ -1,0 +1,197 @@
+; input line: be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
+
+(def lines (split (read-string-from-file "src/main/resources/2021/day08/task-input.txt") "\\r?\\n" 0))
+
+(def left-right-lines 
+	(map
+		(lambda (line) (split line " \\| " 0)) 
+		lines
+	)
+)
+
+; sort the letters in a string
+(def-function sort-letters (str)
+	(from-chars
+		(sort 
+			(lambda (a b)
+				(if-else (lt a b) 
+					-1 
+					(if-else (gt a b) 
+						1 
+						0
+					)
+				)
+			) 
+			(to-chars str)
+		)
+	)
+)
+
+(def-function sort-letters-in-list (strings)
+	(map
+		sort-letters
+		strings
+	)
+)
+
+(def input-output-lines 
+	(map
+		(lambda (lr-line) 
+			(list
+				(sort-letters-in-list (split (first lr-line) " " 0))
+				(sort-letters-in-list (split (last lr-line) " " 0))
+			)
+		) 
+		left-right-lines
+	)
+)
+
+
+(def letter-counts-as-strings
+	(map
+		(lambda (e)
+			(format-number "#" "US" (length e)) 
+		)
+		flat-right-sides
+	)
+)
+
+(def-function contains (values value)
+	(reduce
+		(lambda (acc x)
+			(or acc (eq x value))
+		)
+		nil
+		values
+	)
+)
+
+(def-function remove-all (a b)
+	(filter
+		(lambda (x) 
+			(not (contains b x))
+		)
+		a
+	)
+)
+
+; 2 has 5 segments, when removing segments from 4, then 3 remain
+(def-function is-2 (segs-1 segs-4 segs-7 s)
+	(and
+		(eq 5 (length s))
+		(eq 3 (size (remove-all (to-chars s) segs-4)))
+	)
+)
+
+; 3 has 5 segments, 
+; when removing segments from 1, then 3 remain
+; when removing segments from 7, then 2 remain
+(def-function is-3 (segs-1 segs-4 segs-7 s)
+	(and
+		(eq 5 (length s))
+		(eq 3 (size (remove-all (to-chars s) segs-1)))
+		(eq 2 (size (remove-all (to-chars s) segs-7)))
+	)
+)
+
+; 5 has 5 segments
+; when removing segments from 4, then 2 remain
+; when removing segments from 7, then 3 remain
+(def-function is-5 (segs-1 segs-4 segs-7 s)
+	(and
+		(eq 5 (length s))
+		(eq 2 (size (remove-all (to-chars s) segs-4)))
+		(eq 3 (size (remove-all (to-chars s) segs-7)))
+	)
+)
+
+; 0 has 6 segments, when removing the segments from 4 or 7, then 3 remain
+(def-function is-0 (segs-1 segs-4 segs-7 s)
+	(and
+		(eq 6 (length s))
+		(eq 3 (size (remove-all (to-chars s) segs-4)))
+		(eq 3 (size (remove-all (to-chars s) segs-7)))
+	)
+)
+
+; 6 has 6 segments,
+; when removing segments from 1, then 5 remain
+; when removing segments from 7, then 4 remain
+(def-function is-6 (segs-1 segs-4 segs-7 s)
+	(and
+		(eq 6 (length s))
+		(eq 5 (size (remove-all (to-chars s) segs-1)))
+		(eq 4 (size (remove-all (to-chars s) segs-7)))
+	)
+)
+
+; 9 has 6 segments, when removing segments from 4, then 2 remain
+(def-function is-9 (segs-1 segs-4 segs-7 s)
+	(and
+		(eq 6 (length s))
+		(eq 2 (size (remove-all (to-chars s) segs-4)))
+	)
+)
+
+; strings: a list of 10 different strings
+; output: a map from string to digis (as string)
+(def-function build-map (strings)
+	(def sd-map (dict))
+	(def ds-map (dict))
+	(for-each
+		(lambda (s)
+			(cond
+				(eq 2 (length s)) (sequential (dict-put sd-map s "1") (dict-put ds-map "1" s))
+				(eq 3 (length s)) (sequential (dict-put sd-map s "7") (dict-put ds-map "7" s))
+				(eq 4 (length s)) (sequential (dict-put sd-map s "4") (dict-put ds-map "4" s))
+				(eq 7 (length s)) (sequential (dict-put sd-map s "8") (dict-put ds-map "8" s))
+			)
+		)
+		strings 
+	)
+	(def segs-1 (to-chars (dict-get ds-map "1")))
+	(def segs-4 (to-chars (dict-get ds-map "4")))
+	(def segs-7 (to-chars (dict-get ds-map "7")))
+	(for-each
+		(lambda (s)
+			(cond
+				(is-0 segs-1 segs-4 segs-7 s) (dict-put sd-map s "0")
+				(is-2 segs-1 segs-4 segs-7 s) (dict-put sd-map s "2")
+				(is-3 segs-1 segs-4 segs-7 s) (dict-put sd-map s "3")
+				(is-5 segs-1 segs-4 segs-7 s) (dict-put sd-map s "5")
+				(is-6 segs-1 segs-4 segs-7 s) (dict-put sd-map s "6")
+				(is-9 segs-1 segs-4 segs-7 s) (dict-put sd-map s "9")
+			)
+		)
+		strings 
+	)
+	sd-map
+)
+
+(def-function decode-to-number (str-to-digit-map segments)
+	(parse-number 
+		"#" 
+		"US"
+		(join-list
+			(map
+				(lambda (s)
+					(dict-get str-to-digit-map s)
+				)
+				segments
+			)
+		)
+	)
+)
+
+(def-function decode-line-to-number (line)
+	(def str-to-digit-map (build-map (first line)))
+	(decode-to-number str-to-digit-map (last line))
+)
+
+(reduce
+	(lambda (acc line)
+		(+ acc (decode-line-to-number line))
+	)
+	0
+	input-output-lines
+)
