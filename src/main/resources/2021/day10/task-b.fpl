@@ -1,0 +1,206 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day10/task-input.txt") "\\r?\\n" 0))
+
+(def left-round (char-at "(" 0))	; 40
+(def right-round (char-at ")" 0))	; 41
+
+(def left-square (char-at "[" 0))	; 91
+(def right-square (char-at "]" 0))	; 93
+
+(def left-curly (char-at "{" 0))	; 123
+(def right-curly (char-at "}" 0))	; 125
+
+(def left-angle (char-at "<" 0))	; 60
+(def right-angle (char-at ">" 0))	; 62
+
+; State of the "scanner". Should be moved to an object
+(def eof -1)
+(def line-to-parse "")
+(def pos -1)
+(def token eof)
+(def token-as-string "eof")
+(def stack '())
+
+
+(def-function init-parser (input-line)
+	(set line-to-parse input-line)
+	(set pos -1)
+	(set stack '())
+	(next-token)
+)
+
+(def-function next-token ()
+	(set pos (+ pos 1))
+	(set token 
+		(if-else (lt pos (length line-to-parse))
+			(sequential
+				(set token-as-string (substring line-to-parse pos (+ pos 1)))
+;				(println "next-token: " token-as-string) 
+				(char-at line-to-parse pos)
+			)
+			(sequential
+				(set token-as-string "<eof>")
+;				(println "<eof>")
+				eof
+			)
+		)
+	)
+	(if (is-left) (push token))
+	(if (is-right) (pop))
+	token
+)
+
+(def-function push (value)
+	(set stack (add-end stack value))
+)
+
+(def-function pop ()
+	(set stack (remove-last stack))	
+)
+
+(def-function is-left ()
+	(or
+		(eq token left-round)
+		(eq token left-square)
+		(eq token left-curly)
+		(eq token left-angle)
+	)
+)
+
+(def-function is-right ()
+	(or
+		(eq token right-round)
+		(eq token right-square)
+		(eq token right-curly)
+		(eq token right-angle)
+	)
+)
+
+(def-function right-for-left (t)
+	(cond
+		(eq t left-round)  right-round
+		(eq t left-square) right-square
+		(eq t left-curly)  right-curly
+		(eq t left-angle)  right-angle
+	)
+)
+
+(def-function points (t)
+	(cond
+		(eq t right-round)  1
+		(eq t right-square) 2
+		(eq t right-curly)  3
+		(eq t right-angle)  4
+	)
+)
+
+(def-function parse-list ()
+	(def right (right-for-left token)) ; token is the opening parenthesis
+	(next-token) ; skip left parenthesis
+;	(println "parse-list, right: " (from-chars (list right)))
+	(while (and (ne token right) (ne token eof))
+		(parse-expression)		
+	)
+	(if-else (eq token right)
+		(next-token)
+		(throw (join "Unexpected token: " token-as-string " at position " pos))
+	)
+)
+
+(def-function parse-expression ()
+	(if-else (is-left)
+		(parse-list)
+		(throw (join "Unexpected token: " token-as-string " at position " pos))
+	)
+)
+
+(def-function parse-sequence ()
+;	(println "parse-sequence: " token-as-string)
+	(while (ne token eof)
+		(if-else (is-left)
+			(sequential
+;				(println "found left: " token-as-string)
+				(parse-expression)
+			)
+			(throw (join "Unexpected token: " token-as-string " at position " pos))
+		)
+	)
+)
+
+(def-function build-completion (s)
+	(reduce
+		(lambda (acc t)
+			(add-front (right-for-left t) acc)
+		)
+		'()
+		s
+	)
+)
+
+(def-function compute-score (values)
+	(reduce
+		(lambda (acc v)
+			(+ (* acc 5) (points v))
+		)
+		0
+		values
+	)
+)
+
+(def-function parse-line (line)
+	(try-catch
+		(sequential
+			(init-parser line)
+			(parse-sequence)
+			0
+		)
+		(lambda (message id stacktrace)
+			(if-else (eq token eof)
+				(sequential
+;					(println "line: " line)
+;					(println "stack: " (from-chars stack))
+;					(println "completion: " (from-chars (build-completion stack)))
+;					(println "score: " (compute-score (build-completion stack)))
+;					(println)
+					(compute-score (build-completion stack))
+				)
+				0
+			)
+		)
+	)
+)
+
+(def-function sort-ascending (values)
+	(sort 
+		(lambda (a b)
+			(if-else (lt a b) 
+				-1 
+				(if-else (gt a b) 
+					1 
+					0
+				)
+			)
+		) 
+		values
+	)
+)
+
+(def sorted-scores
+	(sort-ascending
+		(reduce
+			(lambda (acc line)
+				(def score (parse-line line))
+				(if-else (gt score 0)
+					(add-end acc score)
+					acc
+				)
+			)
+			'()
+			list-of-strings
+		)
+	)
+)
+
+(get-element sorted-scores (/ (size sorted-scores) 2))
+
+; 4001832844
+
