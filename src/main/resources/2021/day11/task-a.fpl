@@ -1,0 +1,163 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day11/task-input.txt") "\\r?\\n" 0))
+
+(def rows (size list-of-strings))
+(def cols (length (first list-of-strings)))
+(def step-dict (dict))
+
+; delta row / column of neighbor octopuses
+(def delta-neighbors '(
+		(-1 -1) (-1 0) (-1 1)
+		(0  -1)        (0  1)
+		(1  -1) (1  0) (1  1)
+	)
+)
+
+(def-function key (row col)
+	(join row "-" col)
+)
+
+(from-to 
+	(lambda (row)
+		(def line (get-element list-of-strings row))
+		(from-to 
+			(lambda (col)
+				(def energy (- (char-at line col) (char-at "0" 0)))
+				(dict-def step-dict (key row col) energy)
+			)
+			0 cols
+		)
+	)
+	0 rows
+)
+
+(def-function get-energy-level (d row col)
+	(if-else
+		(and
+			(ge row 0) (lt row rows)
+			(ge col 0) (lt col cols)
+		)
+		(dict-get d (key row col))
+		0
+	)
+)
+
+(def-function increment-and-flash (gen row col)
+	(def old-energy-level (get-energy-level gen row col))
+	(if-else (eq old-energy-level 0)
+		0 ; has flashed in this step
+		(sequential
+			(def new-energy-level (+ old-energy-level 1))
+			(dict-put gen (key row col) new-energy-level)
+			(if-else (gt new-energy-level 9)
+				(do-flash gen row col)
+				0
+			)
+		)
+	)
+)
+
+(def-function do-flash (gen row col)
+;	(println "flash, row: " row ", col: " col)
+	; reset cell, also avoids flashin again in step
+	(dict-put gen (key row col) 0)
+	(reduce
+		(lambda (acc delta)
+			(def n-row (+ row (first delta)))
+			(def n-col (+ col (last delta)))
+			(+ acc (increment-and-flash gen n-row n-col))			
+		)
+		1 ; flash of this cell
+		delta-neighbors
+	)
+)
+
+(def-function next-generation (gen)
+	(def next-gen (dict))
+	
+	; copy dict, increase all levels by 1
+	(from-to 
+		(lambda (row)
+			(from-to 
+				(lambda (col)
+					(dict-def 
+						next-gen 
+						(key row col) 
+						(+ (get-energy-level gen row col) 1)
+					)
+				)
+				0 cols
+			)
+		)
+		0 rows
+	)
+	
+	; flash cells >=9
+	(def flashes
+		(map-sequence 
+			(lambda (row)
+				(map-sequence 
+					(lambda (col)
+						(if-else (gt (get-energy-level next-gen row col) 9)
+							(do-flash next-gen row col)
+							0
+						)
+					)
+					0 cols
+				)
+			)
+			0 rows
+		)
+	)
+;	(println "flashes: " flashes)
+	(def number-of-flashes
+		(reduce
+			(lambda (acc-row flash-row)
+				(+ acc-row
+					(reduce
+						(lambda (acc f)
+							(+ acc f)
+						)
+						0
+						flash-row
+					)
+				)
+			)
+			0
+			flashes
+		)
+	)
+;	(println "number of flashes: " number-of-flashes)
+	
+	(list next-gen number-of-flashes)
+)
+
+(def-function print-grid (grid)
+	(from-to 
+		(lambda (row)
+			(from-to 
+				(lambda (col)
+					(print (get-energy-level grid row col))
+				)
+				0 cols
+			)
+			(println)
+		)
+		0 rows
+	)
+)
+
+
+(def total-flashes 0)
+(from-to 
+	(lambda (gen-count)
+		(def next-and-flashes (next-generation step-dict))
+		(set step-dict (first next-and-flashes))
+		(set total-flashes (+ (last next-and-flashes) total-flashes)) 
+	)
+	0
+	100
+)
+
+total-flashes
+
+; 1694
