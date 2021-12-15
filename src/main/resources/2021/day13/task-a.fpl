@@ -1,0 +1,70 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day13/test-input.txt") "\\r?\\n" 0))
+
+; (x y)
+(def dot-list
+	(map
+		(lambda (pair)
+			(list
+				(parse-number "#" "US" (first pair))
+				(parse-number "#" "US" (last pair))
+			)
+		)
+		(map
+			(lambda (pair-string)
+				(split pair-string "," 0)
+			)
+			(filter
+				(lambda (pair-string)
+					(eq (size (split pair-string "," 0)) 2)
+				)
+				list-of-strings
+			)
+		)
+	)
+)
+
+(def max-x
+	(reduce
+		(lambda (acc pair)
+			(if-else (gt (first pair) acc)
+				(first pair)
+				acc
+			)
+		)
+		0
+		dot-list
+	)
+)
+
+(def max-y
+	(reduce
+		(lambda (acc pair)
+			(if-else (gt (last pair) acc)
+				(last pair)
+				acc
+			)
+		)
+		0
+		dot-list
+	)
+)
+
+(def fold-commands
+	(map
+		(lambda (cmd)
+			; 2: x or y
+			; 3: number as string
+			(def cmd-list (match cmd "fold along (x|y)=(\\d+)"))
+			(list (get-element cmd-list 2) (parse-number "#" "US" (get-element cmd-list 3)))  
+		)
+		(filter
+			(lambda (command-string)
+				(match command-string "fold along .*") 
+			)
+			list-of-strings
+		)
+	)
+)
+
+
+ 
