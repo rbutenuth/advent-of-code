@@ -1,0 +1,159 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day12/task-input.txt") "\\r?\\n" 0))
+
+(def-function is-start (cave)
+	(eq cave "start")
+)
+
+(def-function is-end (cave)
+	(eq cave "end")
+)
+
+(def-function is-big (cave)
+	(eq cave (to-upper-case cave))
+)
+
+(def-function is-small (cave)
+	(eq cave (to-lower-case cave))
+)
+
+(def-function add-to-map (m a b)
+;	(println "a: " a ", b: " b)
+	(put destinations (dict-get m a))
+	(if-else destinations
+		(dict-set m a (add-end destinations b))
+		(dict-def m a (list b))
+	)
+)
+
+(def cave-map (dict))
+(for-each 
+	(lambda (path)
+		(def a (first (split path "-" 0)))
+		(def b (last (split path "-" 0)))
+		(if (not (eq b "start"))
+			(add-to-map cave-map a b)
+		)
+		(if (not (eq a "start"))
+			(add-to-map cave-map b a)
+		)
+	)
+	list-of-strings 
+)
+
+(def-function more-than-one-duplicate-small-cave (path)
+;	(println "path: " path)
+	(def small-caves
+		(filter
+			(lambda (cave)
+				(is-small cave)
+			)
+			path
+		)
+	)
+;	(println "small caves: " small-caves)
+	(def cave-to-count (dict))
+	(for-each 
+		(lambda (cave)
+			(if-else (dict-get cave-to-count cave)
+				(dict-set cave-to-count cave (+ (dict-get cave-to-count cave) 1))
+				(dict-def cave-to-count cave 1)
+			)
+		)
+		small-caves
+	)
+;	(println "cave-to-count: " cave-to-count)
+;	(println "dict-values: " (dict-values cave-to-count))
+	(gt
+		(reduce
+			(lambda (acc count)
+				(cond
+					(gt count 2) (+ acc 2)
+					(gt count 1) (+ acc 1)
+					acc
+				)
+			)
+			0
+			(dict-values cave-to-count)
+		)
+		1	
+	)
+)
+
+(def-function extend-by-one-node (paths)
+	(flat-map
+		(lambda (path)
+			(map
+				(lambda (cave)
+					(add-end path cave) 
+				)
+				(filter
+					(lambda (cave)
+						(not
+							(and
+								(is-small cave)
+								(more-than-one-duplicate-small-cave (add-end path cave))
+							)
+						)
+					)
+					(dict-get cave-map (last path))
+				)
+			)
+		)
+		paths
+	)
+)
+
+(def-function compute-next-front (paths)
+	(append
+		; keep all paths which already reach the end
+		(filter
+			(lambda (path)
+				(is-end (last path))
+			)
+			paths
+		)
+		; extend all paths which have *not* reached the end (filtered input to flat-map)
+		(extend-by-one-node
+			(filter
+				(lambda (path)
+					(not (is-end (last path)))
+				)
+				paths
+			)
+		)
+	)
+)
+
+(def-function all-at-end (paths)
+	(reduce
+		(lambda (acc path)
+			(and acc (is-end (last path)))
+		)
+		1
+		paths
+	)
+)
+
+;(println cave-map)
+ 
+(def paths '(("start")))
+(def count 0)
+(while (and (not (all-at-end paths)) (lt count 100))
+	(set paths (compute-next-front paths))
+;	(for-each
+;		(lambda (path)
+;			(println path)
+;		)
+;		paths
+;	)
+	(set count (+ count 1))
+)
+
+(println "result: " (size paths))
+
+; test-input:		  36
+; test-input2.txt:   103
+; test-input3.txt:  3509
+; task-input.txt:  94849
+
+;(more-than-one-duplicate-small-cave '("a" "b" "B" "b" "c" "d"))
