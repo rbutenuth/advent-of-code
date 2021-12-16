@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day13/test-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day13/task-input.txt") "\\r?\\n" 0))
 
 ; (x y)
 (def dot-list
@@ -21,6 +21,22 @@
 			)
 		)
 	)
+)
+
+(def-function key (x y)
+	(join x "-" y)
+)
+
+; Key: "x-y"
+; Value: (x y)
+(def dot-dict (dict))
+(for-each
+	(lambda (pair)
+		(def x (first pair))
+		(def y (last pair))
+		(dict-def dot-dict (key x y) (list x y))
+	)
+	dot-list
 )
 
 (def max-x
@@ -66,5 +82,49 @@
 	)
 )
 
+(def-function fold-along-x (x)
+	(for-each
+		(lambda (entry)
+			(def k (first entry))
+			(def dx (first (last entry)))
+			(def dy (last (last entry)))
+			;(println k "->" x y)
+			(if (gt dx x)
+				(sequential
+					(dict-put dot-dict k nil)
+					(def new-dx (- (* 2 x) dx))
+					(println dx dy "->" new-dx dy)
+					(dict-put dot-dict (key new-dx dy) (list new-dx dy))
+				)
+			)  
+		)
+		(dict-entries dot-dict) 
+	)
+)
 
- 
+(def-function fold-along-y (y)
+	(for-each
+		(lambda (entry)
+			(def k (first entry))
+			(def dx (first (last entry)))
+			(def dy (last (last entry)))
+			;(println k "->" x y)
+			(if (gt dy y)
+				(sequential
+					(dict-put dot-dict k nil)
+					(def new-dy (- (* 2 y) dy))
+					(println dx dy "->" dx new-dy)
+					(dict-put dot-dict (key dx new-dy) (list dx new-dy))
+				)
+			)  
+		)
+		(dict-entries dot-dict) 
+	)
+)
+
+(size (dict-values dot-dict))
+(fold-along-x 655) ; fold along x=655
+(size (dict-values dot-dict))
+
+; 765
+
