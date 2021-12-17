@@ -1,0 +1,109 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day14/task-input.txt") "\\r?\\n" 0))
+
+(def template (first list-of-strings))
+
+(def rule-pattern "([A-Z]+) -> ([A-Z]+)")
+ 
+(def rule-dict
+	(map-to-dict 
+		(lambda (rule)
+			(get-element (match rule rule-pattern) 2)
+		) 
+		(lambda (old rule)
+			(get-element (match rule rule-pattern) 3)
+		) 
+		(filter
+			(lambda (rule)
+				(match rule rule-pattern)
+			)
+			list-of-strings
+		) 
+	)
+)
+
+(def-function polymer-as-list-of-chars (polymer)
+	(map
+		(lambda (char)
+			(from-char char)
+		)
+		(to-chars polymer)
+	)
+)
+
+(def-function apply-rules (rules polymer)
+	(last
+		(reduce
+			(lambda (acc char)
+				(put previous (first acc))
+				(put collected (last acc))
+				(if-else previous
+					(sequential
+						(put rule-target (dict-get rules (join previous char)))
+						(if-else rule-target
+							(list char (add-end (add-end collected rule-target) char))
+							(list char (add-end collected char))
+						)
+					)
+					(list char (list char))
+				)
+			)
+			(list nil nil)	
+			polymer
+		)
+	)
+)
+
+(def polymer (polymer-as-list-of-chars template))
+(from-to
+	(lambda (n)
+		(set polymer (apply-rules rule-dict polymer))
+		(println "step: " n ", size: " (size polymer))
+	)
+	0
+	10
+)
+
+(def count-dict 
+	(map-to-dict
+		(lambda (p)
+			p
+		) 
+		(lambda (old-value p)
+			(if-else old-value
+				(+ 1 old-value)
+				1
+			)
+		) 
+		polymer
+	)
+)
+
+(def max
+	(reduce
+		(lambda (acc value)
+			(if-else (gt value acc)
+				value
+				acc
+			)
+		)
+		0
+		(dict-values count-dict)
+	)
+)
+
+(def min
+	(reduce
+		(lambda (acc value)
+			(if-else (lt value acc)
+				value
+				acc
+			)
+		)
+		9999999999
+		(dict-values count-dict)
+	)
+)
+
+(println "result: " (- max min))
+
+; 3247
