@@ -1,8 +1,8 @@
 # advent-of-code
 
-![](https://img.shields.io/badge/day%20📅-17-blue)
+![](https://img.shields.io/badge/day%20📅-18-blue)
 
-![](https://img.shields.io/badge/stars%20⭐-26-yellow)
+![](https://img.shields.io/badge/stars%20⭐-27-yellow)
 
 ![](https://img.shields.io/badge/days%20completed-13-red)
 
