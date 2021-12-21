@@ -1,0 +1,104 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day15/task-input.txt") "\\r?\\n" 0))
+
+(def num-rows (size list-of-strings))
+(def num-cols (length (first list-of-strings)))
+
+; UTF-8 code of "0"
+(def zero (char-at "0" 0))
+
+(def risk-dict (dict))
+(from-to
+	(lambda (row-num)
+		(def row (to-chars (get-element list-of-strings row-num)))
+		(from-to
+			(lambda (col-num)
+				(dict-def risk-dict (join row-num "-" col-num) (- (get-element row col-num) zero))
+			)
+			0
+			num-cols
+		)
+	)
+	0
+	num-rows
+)
+
+(def neighbors '(
+				(-1 0)
+		(0 -1)			(0 1)
+				(1 0)
+	)
+)
+
+; key: "row-col"
+(def expanded-dict (dict))
+(def risk-to-node-dict (dict))
+(dict-def risk-to-node-dict "0-0" 0)
+
+; return a string "row-col"
+(def-function find-lowest-risk ()
+	(reduce
+		(lambda (acc entry)
+			(def acc-cost (last acc))
+			(def entry-cost (last entry)) 
+			(if-else (and (lt entry-cost acc-cost) (not (dict-get expanded-dict (first entry)))) 
+				(list (first entry) entry-cost)
+				acc
+			)
+		)
+		'("x-x" 9223372036854775807) ; ("row-col" cost)
+		(dict-entries risk-to-node-dict)
+	)	
+)
+
+(def-function key-to-row (key)
+	(parse-number "#" "US" (first (split key "-" 0)))
+)
+
+(def-function key-to-col (key)
+	(parse-number "#" "US" (last (split key "-" 0)))
+)
+
+(def-function expand-lowest-risk-node ()
+	(def lowest (find-lowest-risk))
+	(def lowest-key (first lowest))
+	(def lowest-cost (last lowest))
+	(def lowest-key-row (key-to-row lowest-key))
+	(def lowest-key-col (key-to-col lowest-key))
+	(dict-def expanded-dict lowest-key 1)
+	(for-each
+		(lambda (d-list)
+			(def dr (first d-list))
+			(def dc (last d-list))
+			(def new-row (+ lowest-key-row dr))
+			(def new-col (+ lowest-key-col dc))
+			(def new-key (join new-row "-" new-col)) 
+			(if (and
+					(ge new-row 0) (lt new-row num-rows)
+					(ge new-col 0) (lt new-col num-cols)
+					(not (dict-get expanded-dict new-key)) 
+				)
+				(sequential
+					(def new-cost (+ lowest-cost (dict-get risk-dict new-key)))
+					(if (or 
+							(eq nil (dict-get risk-to-node-dict new-key))	  
+							(lt new-cost (dict-get risk-to-node-dict new-key))
+						)
+						(dict-put risk-to-node-dict new-key new-cost) 
+					)
+				)
+			)
+		)
+		neighbors
+	)
+)
+
+(def-function compute-lowest-risk (row col)
+	(while (eq nil (dict-get risk-to-node-dict (join row "-" col)))
+		(expand-lowest-risk-node)
+	)
+	(dict-get risk-to-node-dict (join row "-" col))
+)
+
+(compute-lowest-risk (- num-rows 1) (- num-cols 1))
+
+; 462
