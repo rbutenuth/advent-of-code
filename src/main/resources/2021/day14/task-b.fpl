@@ -1,0 +1,169 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day14/task-input.txt") "\\r?\\n" 0))
+
+(def template (first list-of-strings))
+
+(def rule-pattern "([A-Z]+) -> ([A-Z]+)")
+ 
+(def rule-dict
+	(map-to-dict 
+		(lambda (rule)
+			(get-element (match rule rule-pattern) 2)
+		) 
+		(lambda (old rule)
+			(get-element (match rule rule-pattern) 3)
+		) 
+		(filter
+			(lambda (rule)
+				(match rule rule-pattern)
+			)
+			list-of-strings
+		) 
+	)
+)
+
+(def-function polymer-as-list-of-chars (polymer)
+	(map
+		(lambda (char)
+			(from-char char)
+		)
+		(to-chars polymer)
+	)
+)
+
+(def-function polymer-to-pairs (polymer)
+	(last
+		(reduce
+			(lambda (acc char)
+				(put previous (first acc))
+				(put collected (last acc))
+				(if-else previous
+					(list char (add-end collected (join previous char)))
+					(list char '())
+				)
+			)
+			(list nil nil)	
+			polymer
+		)
+	)
+)
+
+(def-function add-pair-to-dict (d pair count)
+	(if-else (dict-get d pair)
+		(dict-put d pair (+ (dict-get d pair) count))
+		(dict-put d pair count)
+	) 
+)
+
+(def-function sub-pair-from-dict (d pair count)
+	(if (dict-get d pair)
+		(dict-put d pair (- (dict-get d pair) count))
+	) 
+)
+
+(def polymer-dict (dict))
+(for-each
+	(lambda (pair)
+		(add-pair-to-dict polymer-dict pair 1) 
+	)
+	(polymer-to-pairs (polymer-as-list-of-chars template))
+)
+
+(def-function apply-rules (rules old-dict)
+	(def new-dict (dict))
+	(for-each 
+		(lambda (entry)
+			(def pair (first entry))
+			(def count (last entry))
+			(put rule (dict-get rules pair))
+			(println "apply rule" pair "->" rule)
+			(if-else rule
+				(sequential
+					(sub-pair-from-dict new-dict rule count)
+					(add-pair-to-dict new-dict (join (substring pair 0 1) rule) count)
+					(add-pair-to-dict new-dict (join rule (substring pair 1 2)) count)
+				)
+				(add-pair-to-dict new-dict pair count) 
+			)
+		)
+		(dict-entries old-dict)
+	)
+	new-dict
+)
+
+
+
+
+(from-to
+	(lambda (i)
+		(set polymer-dict (apply-rules rule-dict polymer-dict))
+	)
+	0
+	40
+)
+
+; Add "artifical pair consisting of first and last letter of template string
+(add-pair-to-dict polymer-dict 
+	(join
+		(substring template 0 1)
+		(substring template (- (length template) 1) (length template)) 
+	)
+	1
+)
+
+(def count-dict (dict))
+(for-each
+	(lambda (entry)
+		(def pair (first entry))
+		(def count (last entry))
+		(def first-letter (substring pair 0 1))
+		(def last-letter (substring pair 1 2))
+		(put old-count (dict-get count-dict first-letter))
+		(if-else old-count
+			(dict-set count-dict first-letter (+ old-count count))
+			(dict-def count-dict first-letter count)
+		)
+		(put old-count (dict-get count-dict last-letter))
+		(if-else old-count
+			(dict-set count-dict last-letter (+ old-count count))
+			(dict-def count-dict last-letter count)
+		)
+	)
+	(dict-entries polymer-dict)
+)
+
+(def max
+	(/
+		(reduce
+			(lambda (acc value)
+				(if-else (gt value acc)
+					value
+					acc
+				)
+			)
+			0
+			(dict-values count-dict)
+		)
+		2
+	)
+)
+
+(def min
+	(/
+		(reduce
+			(lambda (acc value)
+				(if-else (or (eq acc -1) (lt value acc))
+					value
+					acc
+				)
+			)
+			-1
+			(dict-values count-dict)
+		)
+		2
+	)
+)
+
+(println "result: " (- max min))
+
+; 4110568157153
+
