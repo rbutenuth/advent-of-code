@@ -1,0 +1,182 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day15/task-input.txt") "\\r?\\n" 0))
+
+(def num-rows (size list-of-strings))
+(def num-cols (length (first list-of-strings)))
+
+; UTF-8 code of "0"
+(def zero (char-at "0" 0))
+
+(def risk-dict (dict))
+(from-to
+	(lambda (row-num)
+		(def row (to-chars (get-element list-of-strings row-num)))
+		(from-to
+			(lambda (col-num)
+				(dict-def risk-dict (join row-num "-" col-num) (- (get-element row col-num) zero))
+			)
+			0
+			num-cols
+		)
+	)
+	0
+	num-rows
+)
+
+(def neighbors '(
+				(-1 0)
+		(0 -1)			(0 1)
+				(1 0)
+	)
+)
+
+; key: "row-col"
+(def reached-dict (dict))
+(dict-def reached-dict "0-0" 1)
+(def node-to-risk-dict (dict))
+(dict-def node-to-risk-dict "0-0" 0)
+
+; sorted list of "row-col" strings which have to be expanded
+(def next-list '("0-0"))
+
+
+(def-function print-reached-map ()
+	(from-to
+		(lambda (row-num)
+			(from-to
+				(lambda (col-num)
+					(print
+						(if-else (dict-get reached-dict (join row-num "-" col-num))
+							"*"
+							"."
+						) 
+					)
+				)
+				0
+				num-cols
+			)
+			(println)
+		)
+		0
+		num-rows
+	)
+)
+
+; return a string "row-col"
+(def-function fetch-lowest-risk ()
+	(def next (first next-list))
+	(set next-list (remove-first next-list))
+	next
+)
+
+(def-function print-next-list (last-list)
+	(for-each
+		(lambda (element)
+			(print (join element "->" (dict-get node-to-risk-dict element) " "))
+		)
+		next-list
+	)
+	(println)
+	(for-each
+		(lambda (element)
+			(if (eq element nil)
+				(throw (list last-list next-list "nil found in list"))
+			)
+		)
+		next-list
+	)
+)
+
+; find the smallest i so that cost-key <= cost(node(i))
+(def-function find-insertion-point (cost from to level)
+	(if-else (gt level 100
+	)
+	(throw "level exceeded")
+	(if-else (eq from to)
+		from
+		(sequential
+			(def half (/ (+ from to) 2))
+			(if-else (lt cost (dict-get node-to-risk-dict (get-element next-list half)))
+				(find-insertion-point cost 0 half (+ level 1))
+				(find-insertion-point cost (+ half 1) to  (+ level 1))
+			)
+		)
+	)
+	)
+)
+
+(def-function check-sorted ()
+	(reduce
+		(lambda (acc key)
+			(def cost (dict-get node-to-risk-dict key))
+			(if (lt cost acc)
+				(throw "not sorted")
+			)T
+			cost
+		)
+		0
+		next-list
+	)
+)
+(def-function add-to-next-list (key cost)
+	(def last-list next-list)
+	(def insert-before (find-insertion-point cost 0 (size next-list) 0))
+	(set next-list
+		(append 
+			(add-end (sub-list next-list 0 insert-before) key)
+			(sub-list next-list insert-before (size next-list))
+		)
+	)
+	(check-sorted)
+	(if (ne (+ (size last-list) 1) (size next-list))
+		(throw (list "wrong size" last-list next-list insert-before key))
+	)
+)
+
+(def-function key-to-row (key)
+	(parse-number "#" "US" (first (split key "-" 0)))
+)
+
+(def-function key-to-col (key)
+	(parse-number "#" "US" (last (split key "-" 0)))
+)
+
+(def-function expand-lowest-risk-node ()
+	(def lowest-key (fetch-lowest-risk))
+
+	(def lowest-cost (dict-get node-to-risk-dict lowest-key))
+	(def lowest-key-row (key-to-row lowest-key))
+	(def lowest-key-col (key-to-col lowest-key))
+	(for-each
+		(lambda (d-list)
+			(def new-row (+ lowest-key-row (first d-list)))
+			(def new-col (+ lowest-key-col (last d-list)))
+			(def new-key (join new-row "-" new-col)) 
+			(if (and
+					(ge new-row 0) (lt new-row num-rows)
+					(ge new-col 0) (lt new-col num-cols)
+					(not (dict-get reached-dict new-key)) 
+				)
+				(sequential
+					(dict-def reached-dict new-key 1)
+					(def new-cost (+ lowest-cost (dict-get risk-dict new-key)))
+					(dict-def node-to-risk-dict new-key new-cost)
+					(add-to-next-list new-key new-cost)
+				)
+			)
+		)
+		neighbors
+	)
+)
+
+(def-function compute-lowest-risk (row col)
+	(while (eq nil (dict-get node-to-risk-dict (join row "-" col)))
+		(expand-lowest-risk-node)
+	)
+	(dict-get node-to-risk-dict (join row "-" col))
+)
+
+(compute-lowest-risk (- num-rows 1) (- num-cols 1))
+
+; 462, about 60s when optimization level is like task-a.fpl, about 2s for task-a.fpl
+
+;(print-reached-map)
