@@ -6,13 +6,34 @@
 ; UTF-8 code of "0"
 (def zero (char-at "0" 0))
 
+(def multiplier 5)
+
+(def-function wrapped-value (original-value tile-row tile-column)
+	(+ (% (+ (- original-value 1) tile-row tile-column) 9) 1)
+)
+
 (def risk-dict (dict))
 (from-to
 	(lambda (row-num)
-		(def row (to-chars (get-element list-of-strings row-num)))
+		(def row-as-list (to-chars (get-element list-of-strings row-num)))
 		(from-to
 			(lambda (col-num)
-				(dict-def risk-dict (join row-num "-" col-num) (- (get-element row col-num) zero))
+				(def value (- (get-element row-as-list col-num) zero))
+				(from-to
+					(lambda (row-mult)
+						(from-to
+							(lambda (col-mult)
+								(def row (+ row-num (* row-mult num-rows)))
+								(def col (+ col-num (* col-mult num-cols)))
+								(dict-def risk-dict (join row "-" col) (wrapped-value value row-mult col-mult))
+							)
+						0
+						multiplier
+						)
+					)
+					0
+					multiplier
+				)
 			)
 			0
 			num-cols
@@ -20,6 +41,26 @@
 	)
 	0
 	num-rows
+)
+
+(set num-rows (* multiplier num-rows))
+(set num-cols (* multiplier num-cols))
+
+(def-function print-risk-dict ()
+	(from-to
+		(lambda (row)
+			(from-to
+				(lambda (col)
+					(print (dict-get risk-dict (join row "-" col)))
+				)
+				0
+				num-cols
+			)
+			(println)
+		)
+		0
+		num-rows
+	)
 )
 
 (def neighbors '(
@@ -76,14 +117,6 @@
 		next-list
 	)
 	(println)
-	(for-each
-		(lambda (element)
-			(if (eq element nil)
-				(throw (list last-list next-list "nil found in list"))
-			)
-		)
-		next-list
-	)
 )
 
 ; find the smallest i so that cost-key <= cost(node(i))
@@ -126,7 +159,7 @@
 			(sub-list next-list insert-before (size next-list))
 		)
 	)
-	(check-sorted)
+;	(check-sorted)
 	(if (ne (+ (size last-list) 1) (size next-list))
 		(throw (list "wrong size" last-list next-list insert-before key))
 	)
@@ -177,6 +210,6 @@
 
 (compute-lowest-risk (- num-rows 1) (- num-cols 1))
 
-; 462, about 60s when optimization level is like task-a.fpl, about 2s for task-a.fpl
+; 462, about 60s when optimization level is like task-a.fpl
 
-;(print-reached-map)
+; 2846, about 17s
