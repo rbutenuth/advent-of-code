@@ -1,0 +1,182 @@
+(def input (read-string-from-file "src/main/resources/2021/day16/task-input.txt"))
+
+(println "input:" input)
+
+; "8A004A801A8002F478" -> 16
+; "620080001611562C8802118E34" -> 12
+; "C0015000016115A2E0802F182340" -> 23
+; "A0016C880162017C3686B18A3D4780" -> 31
+
+;(def input "A0016C880162017C3686B18A3D4780")
+ 
+(def bit-dict (dict
+	"0" '(0 0 0 0)
+	"1" '(0 0 0 1)
+	"2" '(0 0 1 0)
+	"3" '(0 0 1 1)
+	"4" '(0 1 0 0)
+	"5" '(0 1 0 1)
+	"6" '(0 1 1 0)
+	"7" '(0 1 1 1)
+	"8" '(1 0 0 0)
+	"9" '(1 0 0 1)
+	"A" '(1 0 1 0)
+	"B" '(1 0 1 1)
+	"C" '(1 1 0 0)
+	"D" '(1 1 0 1)
+	"E" '(1 1 1 0)
+	"F" '(1 1 1 1)
+	)
+)
+
+(def-function string-to-bit-list (str)
+	(flat-map
+		(lambda (utf)
+			(dict-get bit-dict (from-char utf))
+		)
+	 	(to-chars str)
+	 )
+)
+
+(def bits (string-to-bit-list input))
+(def pos 0)
+
+(println "number of bits:" (size bits))
+
+(def-function bits-as-number (start count)
+	(def value 0)
+	(def i 0)
+	(while (lt i count)
+		(set value 
+			(+ (* value 2) (get-element bits (+ start i)))
+		)
+		(set i (+ i 1))
+	)
+	value
+)
+
+(def-function read-literal-number ()
+	(def number 0)
+	(while (eq 1 (get-element bits pos))
+		(set pos (+ pos 1))
+		(set number (+ (* number 16) (bits-as-number pos 4))) 
+		(set pos (+ pos 4))
+	)
+	(set pos (+ pos 1))
+	(set number (+ (* number 16) (bits-as-number pos 4)))
+	(set pos (+ pos 4))
+	number		
+)
+
+(def-function read-packet ()
+	(def version (bits-as-number pos 3))
+	(set pos (+ pos 3))
+	(def type-id (bits-as-number pos 3))
+	(set pos (+ pos 3))
+	(cond
+		(eq type-id 4)
+			(read-literal-number)   ; 4 is literal value
+			(read-operator type-id) ; any other type-id is an operator 
+	)
+)
+
+(def-function read-sub-packets-by-bits ()
+	(def result '())
+	(def number-of-bits (bits-as-number pos 15))
+	(set pos (+ pos 15))
+	(def end-pos (+ pos number-of-bits))
+	(while (lt pos end-pos)
+		(set result (add-end result (read-packet)))
+	)
+	result
+)
+
+(def-function read-sub-packets-by-count ()
+	(def result '())
+	(def packets-to-read (bits-as-number pos 11))
+	(set pos (+ pos 11))
+	(def count 0)
+	(while (lt count packets-to-read)
+		(set result (add-end result (read-packet)))
+		(set count (+ count 1))
+	)
+	result
+)
+
+(def-function read-operator (packet-id)
+	(println "read-operator, packet-id:" packet-id)
+	(def next-bit (get-element bits pos))
+	(set pos (+ pos 1))
+	(def sub-list
+		(if-else next-bit
+			(read-sub-packets-by-count)
+			(read-sub-packets-by-bits)
+		)
+	)
+	(reduce-sub-list sub-list packet-id)
+)
+
+(def-function reduce-sub-list (sub-list packet-id)
+	(println "sub-list:" sub-list)
+	(println "operator:" packet-id)
+	(cond 
+		(eq packet-id 0) ; sum
+		(reduce
+			(lambda (acc value)
+				(+ acc value)
+			)
+			0
+			sub-list
+		)
+		
+		(eq packet-id 1) ; product
+		(reduce
+			(lambda (acc value)
+				(* acc value)
+			)
+			1
+			sub-list
+		)
+		
+		(eq packet-id 2) ; minimum
+		(reduce
+			(lambda (acc value)
+				(if-else
+					(lt value acc)
+						value
+						acc
+				)
+			)
+			9223372036854775807
+			sub-list
+		)
+		
+		(eq packet-id 3) ; maximum
+		(reduce
+			(lambda (acc value)
+				(if-else
+					(gt value acc)
+						value
+						acc
+				)
+			)
+			-9223372036854775808
+			sub-list
+		)
+		
+		(eq packet-id 5) ; greather than, two sub-packets
+		(gt (first sub-list) (last sub-list))
+		
+		(eq packet-id 6) ; less than, two sub-packets
+		(lt (first sub-list) (last sub-list))
+		
+		(eq packet-id 7) ; equal
+		(eq (first sub-list) (last sub-list))
+		
+		(throw "unknown packet-id:" packetid)
+	)
+)
+
+(read-packet)
+
+; 660797830937
