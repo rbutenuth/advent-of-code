@@ -1,0 +1,121 @@
+
+; test-values:
+(def target-min-x 20)
+(def target-max-x 30)
+(def target-min-y -10)
+(def target-max-y -5)
+
+; task-values:
+;(def target-min-x 57)
+;(def target-max-x 116)
+;(def target-min-y -198)
+;(def target-max-y -148)
+
+
+(def-function adjust-vx (old-x)
+	(cond
+		(eq old-x 0) 0
+		(gt old-x 0) (- old-x 1)
+		(lt old-x 0) (+ old-x 1)
+	)
+)
+
+(def-function adjust-vy (old-y)
+	(+ old-y 1)
+)
+
+(def max-steps 400)
+
+(def-function hits-target-x-steps (initial-vx)
+	(def x 0)
+	(def vx initial-vx)
+	(def hit-steps '())
+	(def count 0)
+	(while (and (lt x target-max-x) (ne vx 0))
+		(if (and (ge x target-min-x) (le x target-max-x))
+			(set hit-steps (add-end hit-steps count))
+		)
+		(set x (+ x vx))
+		(set vx (adjust-vx vx))
+		(set count (+ count 1))
+	)
+	(if (and (le x target-max-x) (ge x target-min-x) (eq vx 0))
+		(while (le count max-steps)
+			(set hit-steps (add-end hit-steps count))	
+			(set count (+ count 1))
+		)
+	)
+	hit-steps
+)
+
+(def initial-vx-and-steps-hitting-x
+	(filter
+		(lambda (lst)
+			(last lst)
+		)
+		(map-sequence
+			(lambda (initial-vx)
+				(list initial-vx (hits-target-x-steps initial-vx))
+			)
+			1
+			target-max-x 
+		)
+	)
+)
+
+
+(def-function y-after-steps (initial-vy steps)
+		(- (* initial-vy steps) 
+		   (/ (* steps (- steps 1)) 2)
+		)
+	)
+
+(def-function hits-target-y (initial-vy steps)
+	(def y (y-after-steps initial-vy steps))
+	(and (ge y target-min-y) (le y target-max-y))
+)
+
+(def steps-and-initial-vy-hitting-y
+	(map-to-dict
+		(lambda (steps-initial-vy) ; key-lambda
+			(first steps-initial-vy)	
+		)
+		(lambda (old steps-initial-vy) ; value-lambda
+			(last steps-initial-vy)
+		)
+		(filter
+			(lambda (list-dict-pair)
+				(gt (dict-size (last list-dict-pair)) 0)
+			)
+			(map-sequence 
+				(lambda (steps)
+					(def hit-vy-dict (dict))
+					(from-to
+						(lambda (initial-vy)
+							(if (hits-target-y initial-vy steps)
+								(dict-def hit-vy-dict initial-vy initial-vy)
+							)
+						)
+						target-max-y
+						1001
+					)
+					(list steps hit-vy-dict)
+				)
+				0
+				max-steps
+			)
+		)
+	)
+)
+
+;(flat-map
+;	(lambda (initial-vx-list-of-steps)
+;		(map
+;			(lambda (steps)
+;				TODO
+;			)
+;			(last initial-vx-list-of-steps) 
+;		)		
+;	)
+;	initial-vx-and-steps-hitting-x
+;)

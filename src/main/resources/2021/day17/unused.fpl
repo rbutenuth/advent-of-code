@@ -1,0 +1,26 @@
+
+
+(def initial-vy-and-steps-hitting-y
+	(filter
+		(lambda (list-dict-pair)
+			(gt (dict-size (last list-dict-pair)) 0)
+		)
+		(map-sequence 
+			(lambda (initial-vy)
+				(def hit-steps (dict))
+				(from-to
+					(lambda (steps)
+						(if (hits-target-y initial-vy steps)
+							(dict-def hit-steps steps steps)
+						)
+					)
+					0
+					max-steps
+				)
+				(list initial-vy hit-steps)
+			)
+			target-max-y
+			1001
+		)
+	)
+)
