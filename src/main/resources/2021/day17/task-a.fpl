@@ -1,0 +1,167 @@
+
+; task-values:
+(def target-min-x 57)
+(def target-max-x 116)
+(def target-min-y -198)
+(def target-max-y -148)
+
+; test-values:
+;(def target-min-x 20)
+;(def target-max-x 30)
+;(def target-min-y -10)
+;(def target-max-y -5)
+
+
+(def-function adjust-vx (old-x)
+	(cond
+		(eq old-x 0) 0
+		(gt old-x 0) (- old-x 1)
+		(lt old-x 0) (+ old-x 1)
+	)
+)
+
+(def-function adjust-vy (old-y)
+	(+ old-y 1)
+)
+
+(def-function hits-target-x (initial-vx)
+	(def x 0)
+	(def vx initial-vx)
+	(def hit-steps '())
+	(def count 0)
+	(while (and (lt x target-max-x) (ne vx 0))
+		(if (and (ge x target-min-x) (le x target-max-x))
+			(set hit-steps (add-end hit-steps count))
+		)
+		(set x (+ x vx))
+		(set vx (adjust-vx vx))
+		(set count (+ count 1))
+	)
+	(if (lt x target-max-x)
+		(set hit-steps (add-end hit-steps count))
+	)
+	(if-else (eq vx 0)
+		(add-end hit-steps "x")	
+		hit-steps 
+	)
+)
+
+; list of lists: step counts which hit
+(def steps-hitting-x-values
+	(filter
+		(lambda (lst)
+			lst
+		)
+		(map-sequence
+			(lambda (initial-vx)
+				(hits-target-x initial-vx)
+			)
+			1
+			target-max-x 
+		)
+	)
+)
+
+(def step-dict (dict))
+(for-each
+	(lambda (step-list)
+		(for-each
+			(lambda (step)
+				(dict-put step-dict step step)
+			)
+			step-list
+		)
+	)
+	steps-hitting-x-values  
+)
+
+(println "step-dict")
+step-dict
+
+(def-function y-after-steps (initial-vy steps)
+		(- (* initial-vy steps) 
+		   (/ (* steps (- steps 1)) 2)
+		)
+	)
+
+(def-function hits-target-y (initial-vy steps)
+	(def y (y-after-steps initial-vy steps))
+	(and (ge y target-min-y) (le y target-max-y))
+)
+
+(def-function max-y-for-vy-and-steps (initial-vy steps)
+	(def max-y 0)
+	(from-to-inclusive
+		(lambda (step)
+			(def y (y-after-steps initial-vy step))
+			(if (gt y max-y)
+				(set max-y y)
+			)
+		)
+		0 
+		steps
+	)
+	max-y
+)
+
+(def-function max-y-for-steps (steps)
+	(def max-y 0)
+	(from-to
+		(lambda (initial-vy)
+			(if (hits-target-y initial-vy steps)
+				(sequential
+					(def y (max-y-for-vy-and-steps initial-vy steps))
+					(if (gt y max-y)
+						(set max-y y)
+					)
+				)
+			)
+		)
+		0 
+		1000
+	)
+	max-y
+)
+
+(def max-y 0)
+(for-each
+	(lambda (steps)
+		(if-else (is-number steps)
+			(sequential
+				(def max-y-for-steps (max-y-for-steps steps))
+				(if (gt max-y-for-steps max-y)
+					(set max-y max-y-for-steps)
+				)
+			)
+			(sequential
+				(from-to
+					(lambda (s)
+						(def max-y-for-steps (max-y-for-steps s))
+						(if (gt max-y-for-steps max-y)
+							(set max-y max-y-for-steps)
+						)
+					)
+					8
+					10000
+				)
+			)
+		)
+		steps
+	)
+	(dict-values step-dict)
+)
+
+max-y
+
+;(from-to
+;	(lambda (steps)
+;		(def initial-vy 2)
+;		(print "steps:" steps)
+;		(print ", y:" (y-after-steps initial-vy steps))
+;		(println ", hits-target-y (initial-vy steps): " (hits-target-y initial-vy steps))
+;	)
+;	0
+;	10
+;)
+
+; 19503 is correct
