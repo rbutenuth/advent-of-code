@@ -1,15 +1,15 @@
 
 ; test-values:
-(def target-min-x 20)
-(def target-max-x 30)
-(def target-min-y -10)
-(def target-max-y -5)
+;(def target-min-x 20)
+;(def target-max-x 30)
+;(def target-min-y -10)
+;(def target-max-y -5)
 
 ; task-values:
-;(def target-min-x 57)
-;(def target-max-x 116)
-;(def target-min-y -198)
-;(def target-max-y -148)
+(def target-min-x 57)
+(def target-max-x 116)
+(def target-min-y -198)
+(def target-max-y -148)
 
 
 (def-function adjust-vx (old-x)
@@ -31,19 +31,13 @@
 	(def vx initial-vx)
 	(def hit-steps '())
 	(def count 0)
-	(while (and (lt x target-max-x) (ne vx 0))
+	(while (and (le count max-steps) (le x target-max-x))
 		(if (and (ge x target-min-x) (le x target-max-x))
 			(set hit-steps (add-end hit-steps count))
 		)
 		(set x (+ x vx))
 		(set vx (adjust-vx vx))
 		(set count (+ count 1))
-	)
-	(if (and (le x target-max-x) (ge x target-min-x) (eq vx 0))
-		(while (le count max-steps)
-			(set hit-steps (add-end hit-steps count))	
-			(set count (+ count 1))
-		)
 	)
 	hit-steps
 )
@@ -58,7 +52,7 @@
 				(list initial-vx (hits-target-x-steps initial-vx))
 			)
 			1
-			target-max-x 
+			(+ target-max-x 1) 
 		)
 	)
 )
@@ -96,7 +90,7 @@
 								(dict-def hit-vy-dict initial-vy initial-vy)
 							)
 						)
-						target-max-y
+						target-min-y
 						1001
 					)
 					(list steps hit-vy-dict)
@@ -108,14 +102,47 @@
 	)
 )
 
-;(flat-map
-;	(lambda (initial-vx-list-of-steps)
-;		(map
-;			(lambda (steps)
-;				TODO
-;			)
-;			(last initial-vx-list-of-steps) 
-;		)		
-;	)
-;	initial-vx-and-steps-hitting-x
-;)
+(def-function initial-vy-list-for-steps (steps)
+	(def result
+		(if-else (dict-get steps-and-initial-vy-hitting-y steps)
+			(dict-values (dict-get steps-and-initial-vy-hitting-y steps))
+			'()
+		)
+	)
+;	(println "steps: " steps "-> vy" result)
+	result
+)
+
+(def vx-list-of-vy 
+	(map
+		(lambda (initial-vx-list-of-steps)
+			(def vx (first initial-vx-list-of-steps))
+			(def vy-for-vx (dict))
+			(for-each
+				(lambda (steps)
+					(for-each
+						(lambda (vy)
+							(dict-put vy-for-vx vy vy) 
+						)
+						(initial-vy-list-for-steps steps)
+					)
+				)
+				(last initial-vx-list-of-steps) 
+			)
+			(list vx (dict-values vy-for-vx))
+		)
+		initial-vx-and-steps-hitting-x
+	)
+)
+
+(reduce
+	(lambda (acc list-of-vx-to-vy)
+;		(println "vx: " (first list-of-vx-to-vy) ", size:" (size (last list-of-vx-to-vy)))
+		(+ acc (size (last list-of-vx-to-vy)))
+	)
+	0
+	vx-list-of-vy
+)
+
+; 5200
+
