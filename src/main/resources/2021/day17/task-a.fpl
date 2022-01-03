@@ -11,6 +11,11 @@
 ;(def target-min-y -10)
 ;(def target-max-y -5)
 
+(def max-initial-vy (+ 1 (- target-min-y)))
+(def max-steps (+ (* 2 max-initial-vy) 1))
+
+(println "max-initial-vy:" max-initial-vy ", max-steps:" max-steps)
+
 
 (def-function adjust-vx (old-x)
 	(cond
@@ -118,7 +123,7 @@ step-dict
 			)
 		)
 		0 
-		1000
+		max-initial-vy
 	)
 	max-y
 )
@@ -142,7 +147,7 @@ step-dict
 						)
 					)
 					8
-					400
+					max-steps
 				)
 			)
 		)

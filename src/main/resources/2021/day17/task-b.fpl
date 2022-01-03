@@ -24,7 +24,10 @@
 	(+ old-y 1)
 )
 
-(def max-steps 400)
+(def max-initial-vy (+ 1 (- target-min-y)))
+(def max-steps (+ (* 2 max-initial-vy) 1))
+
+(println "max-initial-vy:" max-initial-vy ", max-steps:" max-steps)
 
 (def-function hits-target-x-steps (initial-vx)
 	(def x 0)
@@ -91,7 +94,7 @@
 							)
 						)
 						target-min-y
-						1001
+						max-initial-vy
 					)
 					(list steps hit-vy-dict)
 				)

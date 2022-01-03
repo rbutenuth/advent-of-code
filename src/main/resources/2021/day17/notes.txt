@@ -1,0 +1,4 @@
+y(s) = vy * s - s * (s - 1) / 2
+
+y(s) = 0 <=> s = 2 * vy + 1, at this point vy_current = -vy (initial)
+so we can stop with vy = - y-target-min and s = 2 * vy + 1
