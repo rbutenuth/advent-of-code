@@ -1,0 +1,192 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day18/task-input.txt") "\\r?\\n" 0))
+
+(def-function sn-to-fpl (string)
+	(first 
+		(parse-string
+			(replace-all
+				(replace-all 
+					(replace-all string "\\[" "(")
+					"\\]" ")"
+				)
+				"," " "
+			)
+			false
+		)
+	)
+)
+
+(def list-of-numbers
+	(map
+		sn-to-fpl
+		list-of-strings
+	)
+)
+
+(def-function can-explode (level sn-number)
+	(and
+		(eq level 4)
+		(is-list sn-number)
+		(is-number (first sn-number))
+		(is-number (last sn-number))
+	)
+)
+
+(def-function add-to-leftmost (value sn-number)
+	(if-else (is-number sn-number)
+		(+ value sn-number)
+		(list 
+			(add-to-leftmost value (first sn-number))
+			(last sn-number)
+		)
+	)
+)
+
+(def-function add-to-rightmost (value sn-number)
+	(if-else (is-number sn-number)
+		(+ value sn-number)
+		(list 
+			(first sn-number)
+			(add-to-rightmost value (last sn-number))
+		)
+	)
+)
+
+; input: nesting level (initially 0), sn-number to explode
+; return:
+;   first: 0 or list with left and right number to add due to explosion
+;   last: exploded number
+(def-function sn-explode (level sn-number)
+	(cond
+		(gt level 4)
+			(list 0 sn-number)
+		(is-number sn-number) ; literal
+			(list 0 sn-number)
+		(can-explode level sn-number)
+			(list sn-number 0)
+		; else, list, but not on "explode level"
+			(sequential
+				(def left (sn-explode (+ level 1) (first sn-number)))
+				(if-else (first left) ; have exploded left side
+					(sequential
+						(def values (first left))
+						(def sn-right (add-to-leftmost (last values) (last sn-number)))
+						(list
+							(list (first values) 0)
+							(list 
+								(last left)
+								sn-right
+							)
+						)
+					)
+					(sequential
+						(def right (sn-explode (+ level 1) (last sn-number)))
+						(if-else (first right) ; have exploded right side
+							(sequential
+								(def values (first right))
+								(def sn-left (add-to-rightmost (first values) (first sn-number)))
+								(list
+									(list 0 (last values))
+									(list 
+										sn-left
+										(last right)
+									)
+								)
+							)
+							; neither left nor right side exploded, just combine to pair
+							(list
+								0
+								(list (last left) (last right))
+							)
+						)
+					)
+				)
+			)
+	)
+)
+
+; input: sn-number to split
+; return:
+;   first: have splitted?
+;   last: splitted sn-number
+(def-function sn-split (sn-number)
+	(if-else (is-list sn-number)
+		; if: is list
+		(sequential
+			(def splitted (sn-split (first sn-number)))
+			(def have-splitted (first splitted))
+			(def splitted-number (last splitted))
+			(if-else have-splitted
+				(list 1 (list splitted-number (last sn-number)))
+				(sequential
+					(set splitted (sn-split (last sn-number)))
+					(list 
+						(first splitted)
+						(list (first sn-number) (last splitted))
+					)
+				)
+			)
+		)
+		; else: is literal
+		(if-else (ge sn-number 10)
+			(list
+				1
+				(list
+					(/ sn-number 2)
+					(/ (+ sn-number 1) 2)
+				)
+			)
+			(list 0 sn-number)
+		)
+	)
+)
+
+(def-function sn-reduce (sn-number)
+	(def work sn-number)
+	(def have-reduced 1)
+	(while have-reduced
+		(put reduced (sn-explode 0 work))
+		(put have-exploded (first reduced))
+		(set work (last reduced))
+		(if (not have-exploded)
+			(sequential
+				(put reduced (sn-split work))
+				(put have-split (first reduced))
+				(set work (last reduced))
+			)
+		)
+		(set have-reduced (or have-exploded have-split))
+	)
+	work
+)
+
+(def-function sn-magnitude (sn-number)
+	(if-else (is-list sn-number)
+		(+
+			(* 3 (sn-magnitude (first sn-number)))
+			(* 2 (sn-magnitude (last sn-number)))
+		)
+		sn-number
+	)
+)
+
+(def-function sn-add (a b)
+	(sn-reduce (list a b))
+)
+
+(def max-magnitude 0)
+(for-each
+	(lambda (x)
+		(for-each
+			(lambda (y)
+				(def magnitude (sn-magnitude (sn-add x y)))
+				(if (gt magnitude max-magnitude)
+					(set max-magnitude magnitude)
+				)
+			)
+			list-of-numbers
+		)
+	)
+	list-of-numbers
+)
+
+max-magnitude
