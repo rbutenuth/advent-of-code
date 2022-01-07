@@ -1,0 +1,16 @@
+(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day19/test-input.txt") "\\r?\\n" 0))
+
+; ("--- scanner 0 ---" "404,-588,-901" ...)
+
+(split-by
+	(lambda (number line)
+		(match line "--- scanner (\\d+) ---")
+	)
+	(filter
+		(lambda (line)
+			(gt (length line) 0)
+		)
+		list-of-strings
+	)
+)
+	 
