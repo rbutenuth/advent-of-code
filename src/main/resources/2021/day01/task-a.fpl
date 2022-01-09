@@ -1,10 +1,10 @@
 ; https://adventofcode.com/2021/day/1
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day01/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def list-of-numbers (map (lambda (x) (parse-number "#" "US" x)) list-of-strings)) 
 
-(last (reduce 
+(def result (last (reduce 
 	(lambda (acc value)
 		(put last-value (first acc))
 		(def sum (last acc))
@@ -15,4 +15,4 @@
 	) 
 	'(nil 0)
 	list-of-numbers
-))
+)))
