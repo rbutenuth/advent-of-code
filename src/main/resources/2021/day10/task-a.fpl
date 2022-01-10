@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day10/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def left-round (char-at "(" 0))	; 40
 (def right-round (char-at ")" 0))	; 41
@@ -115,14 +115,15 @@
 	)
 )
 
-(reduce
-	(lambda (acc line)
-;		(println "line: " line)
-;		(println "parse-line returned: " (parse-line line))
-		(+ acc (parse-line line))
-	)
-	0
-	list-of-strings
+(def
+	result
+		(reduce
+			(lambda (acc line)
+;				(println "line: " line)
+;				(println "parse-line returned: " (parse-line line))
+				(+ acc (parse-line line))
+			)
+			0
+			list-of-strings
+		)
 )
-
-; 392139

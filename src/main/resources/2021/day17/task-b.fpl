@@ -138,14 +138,14 @@
 	)
 )
 
-(reduce
-	(lambda (acc list-of-vx-to-vy)
-;		(println "vx: " (first list-of-vx-to-vy) ", size:" (size (last list-of-vx-to-vy)))
-		(+ acc (size (last list-of-vx-to-vy)))
+(def
+	result
+	(reduce
+		(lambda (acc list-of-vx-to-vy)
+;			(println "vx: " (first list-of-vx-to-vy) ", size:" (size (last list-of-vx-to-vy)))
+			(+ acc (size (last list-of-vx-to-vy)))
+		)
+		0
+		vx-list-of-vy
 	)
-	0
-	vx-list-of-vy
 )
-
-; 5200
-

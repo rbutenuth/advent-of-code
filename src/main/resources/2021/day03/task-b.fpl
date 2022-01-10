@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day03/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def zero (char-at "0" 0))
 (def one (char-at "1" 0))
@@ -74,7 +74,8 @@
 (def oxygen-rating (binary-to-integer (oxygen-rating-as-string list-of-strings 0)))
 (def co2-rating (binary-to-integer (co2-rating-as-string list-of-strings 0)))
 
-(* oxygen-rating co2-rating)
-
-; 482500
+(def
+	result
+	(* oxygen-rating co2-rating)
+)
 

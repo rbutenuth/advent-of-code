@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day14/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def template (first list-of-strings))
 
@@ -163,7 +163,5 @@
 	)
 )
 
-(println "result: " (- max min))
-
-; 4110568157153
+(def result (- max min))
 

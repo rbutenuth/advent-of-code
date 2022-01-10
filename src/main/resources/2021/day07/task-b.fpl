@@ -2,7 +2,7 @@
 	crab-positions 
 	(map
 		(lambda (str) (parse-number "#" "US" str)) 
-		(split (read-string-from-file "src/main/resources/2021/day07/task-input.txt") "," 0)
+		(split (read-string-from-file input-file-name) "," 0)
 	)
 )
 
@@ -57,5 +57,7 @@
 	max-start-position
 )
 
-(println "min-position: " min-position) ; 480
-(println "cost-of-min-position: " cost-of-min-position) ; 89647695
+;(println "min-position: " min-position) ; 480
+;(println "cost-of-min-position: " cost-of-min-position) ; 89647695
+
+(def result cost-of-min-position)

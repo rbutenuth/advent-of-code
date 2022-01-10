@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day04/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def random-numbers 
 	(map 
@@ -230,6 +230,8 @@
 (println "last drawn number: " number)
 (println "score of winning-board: " (score (get-element moving-boards winning-board)))
 
-(println "result: " (* number (score (get-element moving-boards winning-board))))  
+(def
+	result
+	(* number (score (get-element moving-boards winning-board)))
+)  
 
-; 15561

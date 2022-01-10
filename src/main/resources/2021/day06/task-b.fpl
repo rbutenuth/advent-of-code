@@ -2,7 +2,7 @@
 	fish-timers 
 	(map
 		(lambda (str) (parse-number "#" "US" str)) 
-		(split (read-string-from-file "src/main/resources/2021/day06/task-input.txt") "," 0)
+		(split (read-string-from-file input-file-name) "," 0)
 	)
 )
 
@@ -65,10 +65,13 @@
 )
 
 ; Total number of fishes is the sum over the timer-list
-(reduce
-	(lambda (acc count) (+ acc count))
-	0
-	timer-list
+(def
+	result
+	(reduce
+		(lambda (acc count) (+ acc count))
+		0
+		timer-list
+	)
 )
 
-; 1710623015163
+; 

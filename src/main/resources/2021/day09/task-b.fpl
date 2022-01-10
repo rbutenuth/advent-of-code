@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day09/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def cols (length (first list-of-strings)))
 (def rows (size list-of-strings))
@@ -99,6 +99,8 @@
 	)
 )
 
-(* (get-element sorted-sizes 0) (get-element sorted-sizes 1) (get-element sorted-sizes 2))
+(def 
+	result
+	(* (get-element sorted-sizes 0) (get-element sorted-sizes 1) (get-element sorted-sizes 2))
+)
 
-; 1019494

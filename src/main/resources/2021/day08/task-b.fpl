@@ -1,6 +1,6 @@
 ; input line: be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
 
-(def lines (split (read-string-from-file "src/main/resources/2021/day08/task-input.txt") "\\r?\\n" 0))
+(def lines (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def left-right-lines 
 	(map
@@ -46,6 +46,16 @@
 	)
 )
 
+
+(def
+	flat-right-sides
+	(flat-map
+		(lambda (line)
+			(last line)
+		)
+		input-output-lines 
+	)
+)
 
 (def letter-counts-as-strings
 	(map
@@ -188,12 +198,13 @@
 	(decode-to-number str-to-digit-map (last line))
 )
 
-(reduce
-	(lambda (acc line)
-		(+ acc (decode-line-to-number line))
+(def
+	result
+	(reduce
+		(lambda (acc line)
+			(+ acc (decode-line-to-number line))
+		)
+		0
+		input-output-lines
 	)
-	0
-	input-output-lines
 )
-
-; 1096964

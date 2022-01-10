@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day12/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def-function is-start (cave)
 	(eq cave "start")
@@ -115,9 +115,6 @@
 ;	)
 )
 
-(size paths)
+(def result (size paths))
 
-; test-input2.txt:   19
-; test-input3.txt:  226
-; task-input.txt:  3495
 

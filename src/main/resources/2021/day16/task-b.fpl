@@ -1,4 +1,4 @@
-(def input (read-string-from-file "src/main/resources/2021/day16/task-input.txt"))
+(def input (read-string-from-file input-file-name))
 
 (println "input:" input)
 
@@ -177,6 +177,4 @@
 	)
 )
 
-(read-packet)
-
-; 660797830937
+(def result (read-packet))

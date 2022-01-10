@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day02/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 ; each command is a list of the command string followed by the number (command parameter)
 (def list-of-commands 
@@ -44,6 +44,6 @@
 	)
 )
 
-(* (first horizontal-depth-aim) (get-element horizontal-depth-aim 1))
-
-; 1604592846
+(def result 
+	(* (first horizontal-depth-aim) (get-element horizontal-depth-aim 1))
+)

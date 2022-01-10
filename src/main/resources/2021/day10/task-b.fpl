@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day10/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def left-round (char-at "(" 0))	; 40
 (def right-round (char-at ")" 0))	; 41
@@ -200,7 +200,7 @@
 	)
 )
 
-(get-element sorted-scores (/ (size sorted-scores) 2))
-
-; 4001832844
-
+(def 
+	result
+	(get-element sorted-scores (/ (size sorted-scores) 2))
+)

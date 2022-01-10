@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day18/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def-function sn-to-fpl (string)
 	(first 
@@ -189,4 +189,5 @@
 	list-of-numbers
 )
 
-max-magnitude
+(def result max-magnitude)
+

@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day13/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 ; (x y)
 (def dot-list
@@ -124,7 +124,5 @@
 
 (size (dict-values dot-dict))
 (fold-along-x 655) ; fold along x=655
-(size (dict-values dot-dict))
 
-; 765
-
+(def result (size (dict-values dot-dict)))

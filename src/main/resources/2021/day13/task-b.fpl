@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day13/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 ; (x y)
 (def dot-list
@@ -137,6 +137,7 @@
 	fold-commands
 )
 
+
 (from-to-inclusive 
 	(lambda (y)
 		(from-to-inclusive
@@ -154,6 +155,8 @@
 	0
 	max-y
 )
+
+(def result (size (dict-values dot-dict)))
 
 ; ###..####.#..#.####.#....###...##..#..#..
 ; #..#....#.#.#.....#.#....#..#.#..#.#..#..

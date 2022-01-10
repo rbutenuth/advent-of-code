@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day05/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 ; 0,9 -> 5,9
 (def lines-of-vents
@@ -71,13 +71,15 @@
 	lines-of-vents
 )
 
-(size
-	(filter
-		(lambda (no-of-vents)
-			(ge no-of-vents 2)
-		) 
-		(dict-values seabed)
+(def
+	result
+	(size
+		(filter
+			(lambda (no-of-vents)
+				(ge no-of-vents 2)
+			) 
+			(dict-values seabed)
+		)
 	)
 )
 
-; 21466

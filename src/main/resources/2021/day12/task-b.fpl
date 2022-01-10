@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day12/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def-function is-start (cave)
 	(eq cave "start")
@@ -149,11 +149,7 @@
 	(set count (+ count 1))
 )
 
-(println "result: " (size paths))
+(def result (size paths))
 
-; test-input:		  36
-; test-input2.txt:   103
-; test-input3.txt:  3509
-; task-input.txt:  94849
 
 ;(more-than-one-duplicate-small-cave '("a" "b" "B" "b" "c" "d"))

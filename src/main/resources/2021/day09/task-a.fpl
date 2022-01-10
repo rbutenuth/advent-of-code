@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day09/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def cols (length (first list-of-strings)))
 (def rows (size list-of-strings))
@@ -43,18 +43,19 @@
 	)
 )
 
-(reduce
-	(lambda (acc risk)
-		(+ acc risk)
-	)
-	0
-	(filter
-		(lambda (x) x)
-		(flat-map 
+(def
+	result
+	(reduce
+		(lambda (acc risk)
+			(+ acc risk)
+		)
+		0
+		(filter
 			(lambda (x) x)
-			low-points-and-nulls
+			(flat-map 
+				(lambda (x) x)
+				low-points-and-nulls
+			)
 		)
 	)
 )
-
-; 530

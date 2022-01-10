@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day11/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def rows (size list-of-strings))
 (def cols (length (first list-of-strings)))
@@ -153,6 +153,6 @@
 	(set gen-count (+ 1 gen-count))
 )
 
-gen-count
+(def result gen-count)
 
 ; 346

@@ -1,5 +1,5 @@
 
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day03/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def zero (char-at "0" 0))
 (def one (char-at "1" 0))
@@ -62,8 +62,8 @@
 (def epsilon-rate (binary-to-integer (invert-bits-in-string gamma-rate-as-string)))
 
 
-(* gamma-rate epsilon-rate)
-
-; 1307354
-
+(def
+	result
+	(* gamma-rate epsilon-rate)
+)
 

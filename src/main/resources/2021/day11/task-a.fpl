@@ -1,4 +1,4 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day11/task-input.txt") "\\r?\\n" 0))
+(def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def rows (size list-of-strings))
 (def cols (length (first list-of-strings)))
@@ -158,6 +158,4 @@
 	100
 )
 
-total-flashes
-
-; 1694
+(def result total-flashes)

@@ -1,6 +1,6 @@
 ; input line: be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
 
-(def lines (split (read-string-from-file "src/main/resources/2021/day08/task-input.txt") "\\r?\\n" 0))
+(def lines (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
 (def 
 	left-right-lines 
@@ -65,14 +65,14 @@
 	)
 )
 
-(size
-	(filter
-		(lambda (e)
-			(dict-get number-of-segments-to-digit e) 
+(def
+	result
+	(size
+		(filter
+			(lambda (e)
+				(dict-get number-of-segments-to-digit e) 
+			)
+			letter-counts-as-strings 
 		)
-		letter-counts-as-strings 
 	)
 )
-
-; 452
-
