@@ -148,15 +148,14 @@ public class DayTests {
 		runTask("day14/task-b.fpl", "day14/task-input.txt", FplInteger.valueOf(4110568157153L));
 	}
 	
-	 @Test
+	@Test
 	public void day15() throws Exception {
 		runTask("day15/task-a.fpl", "day15/test-input.txt", FplInteger.valueOf(40));
-		// slow, about 76 seconds for all 4 tests
 		if (includeSlow) {
 			runTask("day15/task-a.fpl", "day15/task-input.txt", FplInteger.valueOf(462));
-			runTask("day15/task-b.fpl", "day15/test-input.txt", FplInteger.valueOf(315));
-			runTask("day15/task-b.fpl", "day15/task-input.txt", FplInteger.valueOf(2846));
 		}
+		runTask("day15/task-b.fpl", "day15/test-input.txt", FplInteger.valueOf(315));
+		runTask("day15/task-b.fpl", "day15/task-input.txt", FplInteger.valueOf(2846));
 	}
 	
 	@Test

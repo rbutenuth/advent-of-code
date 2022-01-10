@@ -76,8 +76,8 @@
 (def node-to-risk-dict (dict))
 (dict-def node-to-risk-dict "0-0" 0)
 
-; sorted list of "row-col" strings which have to be expanded
-(def next-list '("0-0"))
+; Key: cost (6 digits), "|", "row-col", value: "row-col"
+(def next-dict (sorted-dict nil "000000|0-0" "0-0"))
 
 
 (def-function print-reached-map ()
@@ -102,67 +102,19 @@
 	)
 )
 
-; return a string "row-col"
+; return a string "row-col" and remove it from dict
 (def-function fetch-lowest-risk ()
-	(def next (first next-list))
-	(set next-list (remove-first next-list))
-	next
+	(dict-fetch-first-value next-dict)
 )
 
-(def-function print-next-list (last-list)
-	(for-each
-		(lambda (element)
-			(print (join element "->" (dict-get node-to-risk-dict element) " "))
-		)
-		next-list
-	)
-	(println)
-)
-
-; find the smallest i so that cost-key <= cost(node(i))
-(def-function find-insertion-point (cost from to level)
-	(if-else (gt level 100
-	)
-	(throw "level exceeded")
-	(if-else (eq from to)
-		from
-		(sequential
-			(def half (/ (+ from to) 2))
-			(if-else (lt cost (dict-get node-to-risk-dict (get-element next-list half)))
-				(find-insertion-point cost 0 half (+ level 1))
-				(find-insertion-point cost (+ half 1) to  (+ level 1))
-			)
-		)
-	)
-	)
-)
-
-(def-function check-sorted ()
-	(reduce
-		(lambda (acc key)
-			(def cost (dict-get node-to-risk-dict key))
-			(if (lt cost acc)
-				(throw "not sorted")
-			)T
-			cost
-		)
-		0
-		next-list
-	)
-)
 (def-function add-to-next-list (key cost)
-	(def last-list next-list)
-	(def insert-before (find-insertion-point cost 0 (size next-list) 0))
-	(set next-list
-		(append 
-			(add-end (sub-list next-list 0 insert-before) key)
-			(sub-list next-list insert-before (size next-list))
-		)
-	)
-;	(check-sorted)
-	(if (ne (+ (size last-list) 1) (size next-list))
-		(throw (list "wrong size" last-list next-list insert-before key))
-	)
+	; six digits, so that string sorting matches number sorting
+	; (we could have provided a sort lambda instead)
+	(dict-put 
+		next-dict 
+		(join (format-number "000000" "US" cost) "|" key) 
+		key
+	) 
 )
 
 (def-function key-to-row (key)
