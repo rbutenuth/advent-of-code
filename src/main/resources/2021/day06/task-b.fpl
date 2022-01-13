@@ -6,7 +6,7 @@
 	)
 )
 
-(def timers (dict 
+(def timers (sorted-dict nil 
 	0 0	
 	1 0	
 	2 0	
