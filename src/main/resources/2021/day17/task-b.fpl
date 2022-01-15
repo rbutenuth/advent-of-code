@@ -74,10 +74,10 @@
 
 (def steps-and-initial-vy-hitting-y
 	(map-to-dict
-		(lambda (steps-initial-vy) ; key-lambda
+		(lambda (steps-initial-vy index) ; key-lambda
 			(first steps-initial-vy)	
 		)
-		(lambda (old steps-initial-vy) ; value-lambda
+		(lambda (old steps-initial-vy index) ; value-lambda
 			(last steps-initial-vy)
 		)
 		(filter

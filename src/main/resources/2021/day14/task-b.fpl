@@ -6,10 +6,10 @@
  
 (def rule-dict
 	(map-to-dict 
-		(lambda (rule)
+		(lambda (rule index)
 			(get-element (match rule rule-pattern) 2)
 		) 
-		(lambda (old rule)
+		(lambda (old rule index)
 			(get-element (match rule rule-pattern) 3)
 		) 
 		(filter

@@ -2,15 +2,46 @@
 
 ; ("--- scanner 0 ---" "404,-588,-901" ...)
 
-(split-by
-	(lambda (number line)
-		(match line "--- scanner (\\d+) ---")
-	)
-	(filter
-		(lambda (line)
-			(gt (length line) 0)
+; result: (("404,-588,-901" ...))
+(def coordinate-strings
+	(map
+		(lambda (one-scanner-list)
+			(filter
+				(lambda (entry)
+					(not (match entry "--- scanner (\\d+) ---"))
+				)
+				one-scanner-list
+			)
 		)
-		list-of-strings
+		(split-by
+			(lambda (number line)
+				(match line "--- scanner (\\d+) ---")
+			)
+			(filter
+				(lambda (line)
+					(gt (length line) 0)
+				)
+				list-of-strings
+			)
+		)
 	)
 )
 
+(def coordinate-numbers
+	(map
+		(lambda (scanner-list)
+			(map 
+				(lambda (probe)
+					(map
+						(lambda (str)
+							(parse-number "#" "US" str)
+						)
+						(split probe "," 0) ; result look like ("404" "-588" "-901")
+					)
+				)
+				scanner-list
+			)
+		)
+		coordinate-strings
+	)
+)

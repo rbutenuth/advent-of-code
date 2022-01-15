@@ -6,10 +6,10 @@
  
 (def rule-dict
 	(map-to-dict 
-		(lambda (rule)
+		(lambda (rule index)
 			(get-element (match rule rule-pattern) 2)
 		) 
-		(lambda (old rule)
+		(lambda (old rule index)
 			(get-element (match rule rule-pattern) 3)
 		) 
 		(filter
@@ -65,10 +65,10 @@
 
 (def count-dict 
 	(map-to-dict
-		(lambda (p)
+		(lambda (p i)
 			p
 		) 
-		(lambda (old-value p)
+		(lambda (old-value p i)
 			(if-else old-value
 				(+ 1 old-value)
 				1
