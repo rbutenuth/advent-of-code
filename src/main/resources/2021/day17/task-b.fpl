@@ -47,7 +47,7 @@
 
 (def initial-vx-and-steps-hitting-x
 	(filter
-		(lambda (lst)
+		(lambda (lst index)
 			(last lst)
 		)
 		(map-sequence
@@ -81,7 +81,7 @@
 			(last steps-initial-vy)
 		)
 		(filter
-			(lambda (list-dict-pair)
+			(lambda (list-dict-pair index)
 				(gt (dict-size (last list-dict-pair)) 0)
 			)
 			(map-sequence 
@@ -118,13 +118,13 @@
 
 (def vx-list-of-vy 
 	(map
-		(lambda (initial-vx-list-of-steps)
+		(lambda (initial-vx-list-of-steps index)
 			(def vx (first initial-vx-list-of-steps))
 			(def vy-for-vx (dict))
 			(for-each
-				(lambda (steps)
+				(lambda (steps index)
 					(for-each
-						(lambda (vy)
+						(lambda (vy index)
 							(dict-put vy-for-vx vy vy) 
 						)
 						(initial-vy-list-for-steps steps)
@@ -141,7 +141,7 @@
 (def
 	result
 	(reduce
-		(lambda (acc list-of-vx-to-vy)
+		(lambda (acc list-of-vx-to-vy index)
 ;			(println "vx: " (first list-of-vx-to-vy) ", size:" (size (last list-of-vx-to-vy)))
 			(+ acc (size (last list-of-vx-to-vy)))
 		)

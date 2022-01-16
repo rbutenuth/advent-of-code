@@ -1,6 +1,6 @@
 (def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
-(def-function sn-to-fpl (string)
+(def-function sn-to-fpl (string index)
 	(first 
 		(parse-string
 			(replace-all
@@ -175,9 +175,9 @@
 
 (def max-magnitude 0)
 (for-each
-	(lambda (x)
+	(lambda (x index)
 		(for-each
-			(lambda (y)
+			(lambda (y index)
 				(def magnitude (sn-magnitude (sn-add x y)))
 				(if (gt magnitude max-magnitude)
 					(set max-magnitude magnitude)

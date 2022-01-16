@@ -5,7 +5,7 @@
 (def 
 	left-right-lines 
 	(map
-		(lambda (line) (split line " \\| " 0)) 
+		(lambda (line index) (split line " \\| " 0)) 
 		lines
 	)
 )
@@ -13,7 +13,7 @@
 (def 
 	input-output-lines 
 	(map
-		(lambda (lr-line) 
+		(lambda (lr-line index) 
 			(list
 				(split (first lr-line) " " 0)
 				(split (last lr-line) " " 0)
@@ -26,7 +26,7 @@
 (def
 	flat-right-sides
 	(flat-map
-		(lambda (line)
+		(lambda (line index)
 			(last line)
 		)
 		input-output-lines 
@@ -35,7 +35,7 @@
 
 (def letter-counts-as-strings
 	(map
-		(lambda (e)
+		(lambda (e i)
 			(format-number "#" "US" (length e)) 
 		)
 		flat-right-sides
@@ -69,7 +69,7 @@
 	result
 	(size
 		(filter
-			(lambda (e)
+			(lambda (e i)
 				(dict-get number-of-segments-to-digit e) 
 			)
 			letter-counts-as-strings 

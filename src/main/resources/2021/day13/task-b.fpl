@@ -3,18 +3,18 @@
 ; (x y)
 (def dot-list
 	(map
-		(lambda (pair)
+		(lambda (pair index)
 			(list
 				(parse-number "#" "US" (first pair))
 				(parse-number "#" "US" (last pair))
 			)
 		)
 		(map
-			(lambda (pair-string)
+			(lambda (pair-string index)
 				(split pair-string "," 0)
 			)
 			(filter
-				(lambda (pair-string)
+				(lambda (pair-string index)
 					(eq (size (split pair-string "," 0)) 2)
 				)
 				list-of-strings
@@ -31,7 +31,7 @@
 ; Value: (x y)
 (def dot-dict (dict))
 (for-each
-	(lambda (pair)
+	(lambda (pair index)
 		(def x (first pair))
 		(def y (last pair))
 		(dict-def dot-dict (key x y) (list x y))
@@ -41,7 +41,7 @@
 
 (def max-x
 	(reduce
-		(lambda (acc pair)
+		(lambda (acc pair index)
 			(if-else (gt (first pair) acc)
 				(first pair)
 				acc
@@ -54,7 +54,7 @@
 
 (def max-y
 	(reduce
-		(lambda (acc pair)
+		(lambda (acc pair index)
 			(if-else (gt (last pair) acc)
 				(last pair)
 				acc
@@ -67,14 +67,14 @@
 
 (def fold-commands
 	(map
-		(lambda (cmd)
+		(lambda (cmd index)
 			; 2: x or y
 			; 3: number as string
 			(def cmd-list (match cmd "fold along (x|y)=(\\d+)"))
 			(list (get-element cmd-list 2) (parse-number "#" "US" (get-element cmd-list 3)))  
 		)
 		(filter
-			(lambda (command-string)
+			(lambda (command-string index)
 				(match command-string "fold along .*") 
 			)
 			list-of-strings
@@ -84,7 +84,7 @@
 
 (def-function fold-along-x (x)
 	(for-each
-		(lambda (entry)
+		(lambda (entry index)
 			(def k (first entry))
 			(def dx (first (last entry)))
 			(def dy (last (last entry)))
@@ -105,7 +105,7 @@
 
 (def-function fold-along-y (y)
 	(for-each
-		(lambda (entry)
+		(lambda (entry index)
 			(def k (first entry))
 			(def dx (first (last entry)))
 			(def dy (last (last entry)))
@@ -125,7 +125,7 @@
 )
 
 (for-each
-	(lambda (command-with-parameter)
+	(lambda (command-with-parameter index)
 		(def command (first command-with-parameter))
 		(def parameter (last command-with-parameter))
 		(if-else

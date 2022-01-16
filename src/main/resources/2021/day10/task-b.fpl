@@ -128,7 +128,7 @@
 
 (def-function build-completion (s)
 	(reduce
-		(lambda (acc t)
+		(lambda (acc t i)
 			(add-front (right-for-left t) acc)
 		)
 		'()
@@ -138,7 +138,7 @@
 
 (def-function compute-score (values)
 	(reduce
-		(lambda (acc v)
+		(lambda (acc v i)
 			(+ (* acc 5) (points v))
 		)
 		0
@@ -187,7 +187,7 @@
 (def sorted-scores
 	(sort-ascending
 		(reduce
-			(lambda (acc line)
+			(lambda (acc line i)
 				(def score (parse-line line))
 				(if-else (gt score 0)
 					(add-end acc score)

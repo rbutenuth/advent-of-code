@@ -1,7 +1,7 @@
 (def 
 	crab-positions 
 	(map
-		(lambda (str) (parse-number "#" "US" str)) 
+		(lambda (str index) (parse-number "#" "US" str)) 
 		(split (read-string-from-file input-file-name) "," 0)
 	)
 )
@@ -19,7 +19,7 @@
 
 (def-function cost (positions target)
 	(reduce
-		(lambda (acc position)
+		(lambda (acc position index)
 			(+ acc (distance-to-cost (abs (- position target))))
 		)
 		0
@@ -29,7 +29,7 @@
 
 (def max-start-position
 	(reduce
-		(lambda (acc pos)
+		(lambda (acc pos index)
 			(if-else (gt pos acc)
 				pos
 				acc

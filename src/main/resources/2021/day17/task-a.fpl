@@ -54,7 +54,7 @@
 ; list of lists: step counts which hit
 (def steps-hitting-x-values
 	(filter
-		(lambda (lst)
+		(lambda (lst index)
 			lst
 		)
 		(map-sequence
@@ -69,9 +69,9 @@
 
 (def step-dict (dict))
 (for-each
-	(lambda (step-list)
+	(lambda (step-list index)
 		(for-each
-			(lambda (step)
+			(lambda (step index)
 				(dict-put step-dict step step)
 			)
 			step-list
@@ -130,7 +130,7 @@ step-dict
 
 (def max-y 0)
 (for-each
-	(lambda (steps)
+	(lambda (steps index)
 		(if-else (is-number steps)
 			(sequential
 				(def max-y-for-steps (max-y-for-steps steps))

@@ -1,7 +1,7 @@
 (def 
 	fish-timers 
 	(map
-		(lambda (str) (parse-number "#" "US" str)) 
+		(lambda (str i) (parse-number "#" "US" str)) 
 		(split (read-string-from-file input-file-name) "," 0)
 	)
 )
@@ -19,7 +19,7 @@
 ))
 
 (for-each
-	(lambda (x)
+	(lambda (x i)
 		(dict-set 
 			timers 
 			x
@@ -64,7 +64,7 @@
 (def
 	result
 	(reduce
-		(lambda (acc count) (+ acc count))
+		(lambda (acc count index) (+ acc count))
 		0
 		timer-list
 	)

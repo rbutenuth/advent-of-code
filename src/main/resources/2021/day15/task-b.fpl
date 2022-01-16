@@ -132,7 +132,7 @@
 	(def lowest-key-row (key-to-row lowest-key))
 	(def lowest-key-col (key-to-col lowest-key))
 	(for-each
-		(lambda (d-list)
+		(lambda (d-list index)
 			(def new-row (+ lowest-key-row (first d-list)))
 			(def new-col (+ lowest-key-col (last d-list)))
 			(def new-key (join new-row "-" new-col)) 

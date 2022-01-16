@@ -27,7 +27,7 @@
 
 (def cave-map (dict))
 (for-each 
-	(lambda (path)
+	(lambda (path index)
 		(def a (first (split path "-" 0)))
 		(def b (last (split path "-" 0)))
 		(add-to-map cave-map a b)
@@ -38,7 +38,7 @@
 
 (def-function contains (values value)
 	(reduce
-		(lambda (acc element)
+		(lambda (acc element index)
 			(or acc (eq value element))
 		)
 		0
@@ -48,13 +48,13 @@
 
 (def-function extend-by-one-node (paths)
 	(flat-map
-		(lambda (path)
+		(lambda (path index)
 			(map
-				(lambda (cave)
+				(lambda (cave index)
 					(add-end path cave) 
 				)
 				(filter
-					(lambda (cave)
+					(lambda (cave index)
 						(not
 							(and
 								(is-small cave)
@@ -74,7 +74,7 @@
 	(append
 		; keep all paths which already reach the end
 		(filter
-			(lambda (path)
+			(lambda (path index)
 				(is-end (last path))
 			)
 			paths
@@ -82,7 +82,7 @@
 		; extend all paths which have *not* reached the end (filtered input to flat-map)
 		(extend-by-one-node
 			(filter
-				(lambda (path)
+				(lambda (path index)
 					(not (is-end (last path)))
 				)
 				paths
@@ -93,7 +93,7 @@
 
 (def-function all-at-end (paths)
 	(reduce
-		(lambda (acc path)
+		(lambda (acc path index)
 			(and acc (is-end (last path)))
 		)
 		1
@@ -108,7 +108,7 @@
 	(set paths (compute-next-front paths))
 
 ;	(for-each
-;		(lambda (path)
+;		(lambda (path index)
 ;			(println path)
 ;		)
 ;		paths

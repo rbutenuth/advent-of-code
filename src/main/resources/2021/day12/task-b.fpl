@@ -27,7 +27,7 @@
 
 (def cave-map (dict))
 (for-each 
-	(lambda (path)
+	(lambda (path index)
 		(def a (first (split path "-" 0)))
 		(def b (last (split path "-" 0)))
 		(if (not (eq b "start"))
@@ -44,7 +44,7 @@
 ;	(println "path: " path)
 	(def small-caves
 		(filter
-			(lambda (cave)
+			(lambda (cave index)
 				(is-small cave)
 			)
 			path
@@ -53,7 +53,7 @@
 ;	(println "small caves: " small-caves)
 	(def cave-to-count (dict))
 	(for-each 
-		(lambda (cave)
+		(lambda (cave index)
 			(if-else (dict-get cave-to-count cave)
 				(dict-set cave-to-count cave (+ (dict-get cave-to-count cave) 1))
 				(dict-def cave-to-count cave 1)
@@ -65,7 +65,7 @@
 ;	(println "dict-values: " (dict-values cave-to-count))
 	(gt
 		(reduce
-			(lambda (acc count)
+			(lambda (acc count index)
 				(cond
 					(gt count 2) (+ acc 2)
 					(gt count 1) (+ acc 1)
@@ -81,13 +81,13 @@
 
 (def-function extend-by-one-node (paths)
 	(flat-map
-		(lambda (path)
+		(lambda (path index)
 			(map
-				(lambda (cave)
+				(lambda (cave index)
 					(add-end path cave) 
 				)
 				(filter
-					(lambda (cave)
+					(lambda (cave index)
 						(not
 							(and
 								(is-small cave)
@@ -107,7 +107,7 @@
 	(append
 		; keep all paths which already reach the end
 		(filter
-			(lambda (path)
+			(lambda (path index)
 				(is-end (last path))
 			)
 			paths
@@ -115,7 +115,7 @@
 		; extend all paths which have *not* reached the end (filtered input to flat-map)
 		(extend-by-one-node
 			(filter
-				(lambda (path)
+				(lambda (path index)
 					(not (is-end (last path)))
 				)
 				paths
@@ -126,7 +126,7 @@
 
 (def-function all-at-end (paths)
 	(reduce
-		(lambda (acc path)
+		(lambda (acc path index)
 			(and acc (is-end (last path)))
 		)
 		1
@@ -141,7 +141,7 @@
 (while (and (not (all-at-end paths)) (lt count 100))
 	(set paths (compute-next-front paths))
 ;	(for-each
-;		(lambda (path)
+;		(lambda (path index)
 ;			(println path)
 ;		)
 ;		paths

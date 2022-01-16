@@ -4,9 +4,9 @@
 ; 0,9 -> 5,9
 (def lines-of-vents
 	(map
-		(lambda (line)
+		(lambda (line i)
 			(map
-				(lambda (str)
+				(lambda (str i)
 					(parse-number "#" "US" str)
 				) 
 				(sub-list (match line "(\\d+),(\\d+) -> (\\d+),(\\d+)") 2 6)
@@ -50,7 +50,7 @@
 
 (def seabed (dict))
 (for-each
-	(lambda (line)
+	(lambda (line i)
 		(draw-line-of-vents seabed line)
 	)
 	lines-of-vents
@@ -59,7 +59,7 @@
 (def result
 	(size
 		(filter
-			(lambda (no-of-vents)
+			(lambda (no-of-vents i)
 				(ge no-of-vents 2)
 			) 
 			(dict-values seabed)

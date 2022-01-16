@@ -1,6 +1,6 @@
 (def list-of-strings (split (read-string-from-file input-file-name) "\\r?\\n" 0))
 
-(def-function sn-to-fpl (string)
+(def-function sn-to-fpl (string index)
 	(first 
 		(parse-string
 			(replace-all
@@ -177,7 +177,7 @@
 	result
 		(sn-magnitude 
 		(reduce
-			(lambda (acc sn-number)
+			(lambda (acc sn-number index)
 				(if-else acc
 					(sn-add acc sn-number)
 					sn-number

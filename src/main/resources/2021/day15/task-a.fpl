@@ -37,7 +37,7 @@
 ; return a string "row-col"
 (def-function find-lowest-risk ()
 	(reduce
-		(lambda (acc entry)
+		(lambda (acc entry index)
 			(def acc-cost (last acc))
 			(def entry-cost (last entry)) 
 			(if-else (and (lt entry-cost acc-cost) (not (dict-get expanded-dict (first entry)))) 
@@ -66,7 +66,7 @@
 	(def lowest-key-col (key-to-col lowest-key))
 	(dict-def expanded-dict lowest-key 1)
 	(for-each
-		(lambda (d-list)
+		(lambda (d-list index)
 			(def dr (first d-list))
 			(def dc (last d-list))
 			(def new-row (+ lowest-key-row dr))

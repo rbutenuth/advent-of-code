@@ -13,7 +13,7 @@
 			(get-element (match rule rule-pattern) 3)
 		) 
 		(filter
-			(lambda (rule)
+			(lambda (rule index)
 				(match rule rule-pattern)
 			)
 			list-of-strings
@@ -23,7 +23,7 @@
 
 (def-function polymer-as-list-of-chars (polymer)
 	(map
-		(lambda (char)
+		(lambda (char index)
 			(from-char char)
 		)
 		(to-chars polymer)
@@ -33,7 +33,7 @@
 (def-function polymer-to-pairs (polymer)
 	(last
 		(reduce
-			(lambda (acc char)
+			(lambda (acc char index)
 				(put previous (first acc))
 				(put collected (last acc))
 				(if-else previous
@@ -62,7 +62,7 @@
 
 (def polymer-dict (dict))
 (for-each
-	(lambda (pair)
+	(lambda (pair index)
 		(add-pair-to-dict polymer-dict pair 1) 
 	)
 	(polymer-to-pairs (polymer-as-list-of-chars template))
@@ -71,11 +71,11 @@
 (def-function apply-rules (rules old-dict)
 	(def new-dict (dict))
 	(for-each 
-		(lambda (entry)
+		(lambda (entry index)
 			(def pair (first entry))
 			(def count (last entry))
 			(put rule (dict-get rules pair))
-			(println "apply rule" pair "->" rule)
+;			(println "apply rule" pair "->" rule)
 			(if-else rule
 				(sequential
 					(sub-pair-from-dict new-dict rule count)
@@ -112,7 +112,7 @@
 
 (def count-dict (dict))
 (for-each
-	(lambda (entry)
+	(lambda (entry index)
 		(def pair (first entry))
 		(def count (last entry))
 		(def first-letter (substring pair 0 1))
@@ -134,7 +134,7 @@
 (def max
 	(/
 		(reduce
-			(lambda (acc value)
+			(lambda (acc value index)
 				(if-else (gt value acc)
 					value
 					acc
@@ -150,7 +150,7 @@
 (def min
 	(/
 		(reduce
-			(lambda (acc value)
+			(lambda (acc value index)
 				(if-else (or (eq acc -1) (lt value acc))
 					value
 					acc

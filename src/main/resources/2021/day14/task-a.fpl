@@ -13,7 +13,7 @@
 			(get-element (match rule rule-pattern) 3)
 		) 
 		(filter
-			(lambda (rule)
+			(lambda (rule index)
 				(match rule rule-pattern)
 			)
 			list-of-strings
@@ -23,7 +23,7 @@
 
 (def-function polymer-as-list-of-chars (polymer)
 	(map
-		(lambda (char)
+		(lambda (char index)
 			(from-char char)
 		)
 		(to-chars polymer)
@@ -33,7 +33,7 @@
 (def-function apply-rules (rules polymer)
 	(last
 		(reduce
-			(lambda (acc char)
+			(lambda (acc char index)
 				(put previous (first acc))
 				(put collected (last acc))
 				(if-else previous
@@ -80,7 +80,7 @@
 
 (def max
 	(reduce
-		(lambda (acc value)
+		(lambda (acc value index)
 			(if-else (gt value acc)
 				value
 				acc
@@ -93,7 +93,7 @@
 
 (def min
 	(reduce
-		(lambda (acc value)
+		(lambda (acc value index)
 			(if-else (lt value acc)
 				value
 				acc

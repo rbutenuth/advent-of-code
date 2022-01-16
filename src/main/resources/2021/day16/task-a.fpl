@@ -31,7 +31,7 @@
 
 (def-function string-to-bit-list (str)
 	(flat-map
-		(lambda (utf)
+		(lambda (utf index)
 			(dict-get bit-dict (from-char utf))
 		)
 	 	(to-chars str)

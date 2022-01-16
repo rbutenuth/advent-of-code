@@ -118,7 +118,7 @@
 (def
 	result
 		(reduce
-			(lambda (acc line)
+			(lambda (acc line index)
 ;				(println "line: " line)
 ;				(println "parse-line returned: " (parse-line line))
 				(+ acc (parse-line line))

@@ -3,7 +3,7 @@
 
 (def random-numbers 
 	(map 
-		(lambda (x) (parse-number "#" "US" x)) 
+		(lambda (x i) (parse-number "#" "US" x)) 
 		(split (first list-of-strings) "," 0)
 	)
 )
@@ -15,11 +15,11 @@
 
 (def-function create-board (number strings)
 	(map
-		(lambda (x) (parse-number "#" "US" x))
+		(lambda (x i) (parse-number "#" "US" x))
 		(filter 
-			(lambda (x) (gt (length x) 0))
+			(lambda (x i) (gt (length x) 0))
 			(flat-map
-				(lambda (x)
+				(lambda (x i)
 					(split x " +" 0)
 				)
 				(sub-list strings (* number 6) (* (+ number 1) 6))
@@ -30,7 +30,7 @@
 
 (def-function create-board-with-marks (number strings)
 	(map
-		(lambda (b) (list b 0))
+		(lambda (b i) (list b 0))
 		(create-board number strings)
 	) 
 )
@@ -121,7 +121,7 @@
 
 (def-function marks-in-cells (cells)
 	(reduce
-		(lambda (acc cell) (+ acc (last cell)))
+		(lambda (acc cell index) (+ acc (last cell)))
 		0
 		cells
 	)
@@ -129,7 +129,7 @@
 
 (def-function max-marks-in-rows (board)
 	(reduce
-		(lambda (acc row) (max acc (marks-in-cells row)))
+		(lambda (acc row index) (max acc (marks-in-cells row)))
 		0
 		(rows-of-board board)
 	)
@@ -137,7 +137,7 @@
 
 (def-function max-marks-in-cols (board)
 	(reduce
-		(lambda (acc col) (max acc (marks-in-cells col)))
+		(lambda (acc col index) (max acc (marks-in-cells col)))
 		0
 		(cols-of-board board)
 	)
@@ -154,9 +154,9 @@
 
 (def-function apply-number (boards number)
 	(map 
-		(lambda (board) 
+		(lambda (board index) 
 			(map
-				(lambda (cell)
+				(lambda (cell index)
 					(if-else
 						(eq number (first cell))
 						(list (first cell) 1)
@@ -172,7 +172,7 @@
 
 (def-function contains (values value)
 	(reduce
-		(lambda (acc element)
+		(lambda (acc element index)
 			(or acc (eq value element))
 		)
 		0
@@ -214,7 +214,7 @@
 
 (def-function score (board)
 	(reduce
-		(lambda (acc cell)
+		(lambda (acc cell index)
 			(if-else 
 				(last cell)
 				acc ; cell is marked, do nothing

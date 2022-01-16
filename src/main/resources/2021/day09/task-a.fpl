@@ -46,14 +46,14 @@
 (def
 	result
 	(reduce
-		(lambda (acc risk)
+		(lambda (acc risk index)
 			(+ acc risk)
 		)
 		0
 		(filter
-			(lambda (x) x)
+			(lambda (x i) x)
 			(flat-map 
-				(lambda (x) x)
+				(lambda (x i) x)
 				low-points-and-nulls
 			)
 		)

@@ -31,7 +31,7 @@
 
 (def-function string-to-bit-list (str)
 	(flat-map
-		(lambda (utf)
+		(lambda (utf index)
 			(dict-get bit-dict (from-char utf))
 		)
 	 	(to-chars str)
@@ -122,7 +122,7 @@
 	(cond 
 		(eq packet-id 0) ; sum
 		(reduce
-			(lambda (acc value)
+			(lambda (acc value index)
 				(+ acc value)
 			)
 			0
@@ -131,7 +131,7 @@
 		
 		(eq packet-id 1) ; product
 		(reduce
-			(lambda (acc value)
+			(lambda (acc value index)
 				(* acc value)
 			)
 			1
@@ -140,7 +140,7 @@
 		
 		(eq packet-id 2) ; minimum
 		(reduce
-			(lambda (acc value)
+			(lambda (acc value index)
 				(if-else
 					(lt value acc)
 						value
@@ -153,7 +153,7 @@
 		
 		(eq packet-id 3) ; maximum
 		(reduce
-			(lambda (acc value)
+			(lambda (acc value index)
 				(if-else
 					(gt value acc)
 						value

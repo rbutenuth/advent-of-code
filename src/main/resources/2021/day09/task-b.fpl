@@ -45,9 +45,9 @@
 
 (def low-points
 	(filter 
-		(lambda (x) x)
+		(lambda (x i) x)
 		(flat-map 
-			(lambda (x) x)
+			(lambda (x i) x)
 			low-points-and-nulls
 		)
 	)
@@ -55,7 +55,7 @@
 
 (def-function flood-fill (d row col)
 	(def key (join row "-" col))
-	(println "key: " key)
+;	(println "key: " key)
 	(if
 		(and
 			(lt (height row col) 9)
@@ -89,7 +89,7 @@
 (def sorted-sizes
 	(sort-descending
 		(map
-			(lambda (low-point)
+			(lambda (low-point index)
 				(def filled (dict))
 				(flood-fill filled (first low-point) (last low-point))
 				(size (dict-keys filled))

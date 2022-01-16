@@ -8,7 +8,7 @@
 
 (def-function count-at-position (values position bit-as-utf-number)
 	(reduce
-		(lambda (acc value)
+		(lambda (acc value index)
 			(+
 				acc
 				(if-else (eq bit-as-utf-number (char-at value position))
@@ -34,7 +34,7 @@
 
 (def-function filter-list (values position bit-as-utf-number)
 	(filter 
-		(lambda (value)
+		(lambda (value index)
 			(eq (char-at value position) bit-as-utf-number)
 		)
 		values

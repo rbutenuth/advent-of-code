@@ -4,13 +4,13 @@
 
 (def left-right-lines 
 	(map
-		(lambda (line) (split line " \\| " 0)) 
+		(lambda (line index) (split line " \\| " 0)) 
 		lines
 	)
 )
 
 ; sort the letters in a string
-(def-function sort-letters (str)
+(def-function sort-letters (str i)
 	(from-chars
 		(sort 
 			(lambda (a b)
@@ -36,7 +36,7 @@
 
 (def input-output-lines 
 	(map
-		(lambda (lr-line) 
+		(lambda (lr-line i) 
 			(list
 				(sort-letters-in-list (split (first lr-line) " " 0))
 				(sort-letters-in-list (split (last lr-line) " " 0))
@@ -50,7 +50,7 @@
 (def
 	flat-right-sides
 	(flat-map
-		(lambda (line)
+		(lambda (line index)
 			(last line)
 		)
 		input-output-lines 
@@ -59,7 +59,7 @@
 
 (def letter-counts-as-strings
 	(map
-		(lambda (e)
+		(lambda (e i)
 			(format-number "#" "US" (length e)) 
 		)
 		flat-right-sides
@@ -68,7 +68,7 @@
 
 (def-function contains (values value)
 	(reduce
-		(lambda (acc x)
+		(lambda (acc x i)
 			(or acc (eq x value))
 		)
 		nil
@@ -78,7 +78,7 @@
 
 (def-function remove-all (a b)
 	(filter
-		(lambda (x) 
+		(lambda (x i) 
 			(not (contains b x))
 		)
 		a
@@ -149,7 +149,7 @@
 	(def sd-map (dict))
 	(def ds-map (dict))
 	(for-each
-		(lambda (s)
+		(lambda (s i)
 			(cond
 				(eq 2 (length s)) (sequential (dict-put sd-map s "1") (dict-put ds-map "1" s))
 				(eq 3 (length s)) (sequential (dict-put sd-map s "7") (dict-put ds-map "7" s))
@@ -163,7 +163,7 @@
 	(def segs-4 (to-chars (dict-get ds-map "4")))
 	(def segs-7 (to-chars (dict-get ds-map "7")))
 	(for-each
-		(lambda (s)
+		(lambda (s i)
 			(cond
 				(is-0 segs-1 segs-4 segs-7 s) (dict-put sd-map s "0")
 				(is-2 segs-1 segs-4 segs-7 s) (dict-put sd-map s "2")
@@ -184,7 +184,7 @@
 		"US"
 		(join-list
 			(map
-				(lambda (s)
+				(lambda (s i)
 					(dict-get str-to-digit-map s)
 				)
 				segments
@@ -201,7 +201,7 @@
 (def
 	result
 	(reduce
-		(lambda (acc line)
+		(lambda (acc line index)
 			(+ acc (decode-line-to-number line))
 		)
 		0

@@ -8,7 +8,7 @@
 
 (def-function count-at-position (values position)
 	(reduce
-		(lambda (acc value)
+		(lambda (acc value index)
 			(+
 				acc
 				(if-else (eq one (char-at value position))

@@ -61,7 +61,7 @@
 	; reset cell, also avoids flashin again in step
 	(dict-put gen (key row col) 0)
 	(reduce
-		(lambda (acc delta)
+		(lambda (acc delta index)
 			(def n-row (+ row (first delta)))
 			(def n-col (+ col (last delta)))
 			(+ acc (increment-and-flash gen n-row n-col))			
@@ -111,10 +111,10 @@
 ;	(println "flashes: " flashes)
 	(def number-of-flashes
 		(reduce
-			(lambda (acc-row flash-row)
+			(lambda (acc-row flash-row index )
 				(+ acc-row
 					(reduce
-						(lambda (acc f)
+						(lambda (acc f i)
 							(+ acc f)
 						)
 						0

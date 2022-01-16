@@ -4,7 +4,7 @@
 ; each command is a list of the command string followed by the number (command parameter)
 (def list-of-commands 
 	(map 
-		(lambda (x) 
+		(lambda (x i) 
 			(list
 			    (first (split x " " 0))
 		 		(parse-number "#" "US" 
@@ -18,7 +18,7 @@
 
 (def horizontal-depth 
 	(reduce 
-		(lambda (acc value)
+		(lambda (acc value index)
 			(def command (first value))
 			(def parameter (last value))
 			(cond
