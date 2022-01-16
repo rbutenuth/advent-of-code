@@ -1,47 +1,61 @@
-(def list-of-strings (split (read-string-from-file "src/main/resources/2021/day19/test-input.txt") "\\r?\\n" 0))
-
-; ("--- scanner 0 ---" "404,-588,-901" ...)
-
-; result: (("404,-588,-901" ...))
-(def coordinate-strings
-	(map
-		(lambda (one-scanner-list)
-			(filter
-				(lambda (entry)
-					(not (match entry "--- scanner (\\d+) ---"))
-				)
-				one-scanner-list
+(def scanner-dict
+	(pipeline $
+		; split input file into lines
+		(split (read-string-from-file "src/main/resources/2021/day19/test-input.txt") "\\r?\\n" 0)
+		; remove empty lines
+		(filter
+			(lambda (line index)
+				(gt (length line) 0)
 			)
+			$
 		)
+		; split into separate lists, divide by lines like "--- scanner 0 ---"
 		(split-by
-			(lambda (number line)
-				(match line "--- scanner (\\d+) ---")
+			(lambda (line index)
+				(match line "--- scanner \\d+ ---")
 			)
-			(filter
-				(lambda (line)
-					(gt (length line) 0)
+			$
+		)
+		; remove the split marker lines
+		(map
+			(lambda (scanner scanner-index)
+				(filter
+					(lambda (entry index)
+						(not (match entry "--- scanner \\d+ ---"))
+					)
+					scanner
 				)
-				list-of-strings
 			)
+			$
+		)
+		; split strings like "404,-588,-901" and parse the numbers
+		(map
+			(lambda (scanner scanner-index)
+				(map
+					(lambda (probe probe-index)
+						(map
+							(lambda (probe-string i)
+								(parse-number "#" "US" probe-string)
+							)
+							(split probe "," 0)
+						)
+					)
+					scanner
+				)
+			)
+			$
+		)
+		(map-to-sorted-dict
+			(lambda (scanner index)
+				index
+			)
+			(lambda (old scanner index)
+				scanner
+			)
+			nil
+			$
 		)
 	)
 )
 
-(def coordinate-numbers
-	(map
-		(lambda (scanner-list)
-			(map 
-				(lambda (probe)
-					(map
-						(lambda (str)
-							(parse-number "#" "US" str)
-						)
-						(split probe "," 0) ; result look like ("404" "-588" "-901")
-					)
-				)
-				scanner-list
-			)
-		)
-		coordinate-strings
-	)
-)
+(println (dict-get scanner-dict 0))
