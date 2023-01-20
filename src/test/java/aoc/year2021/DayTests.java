@@ -23,7 +23,7 @@ import de.codecentric.fpl.parser.Position;
 import de.codecentric.fpl.parser.Scanner;
 
 public class DayTests {
-	private boolean includeSlow = false;
+	private boolean includeSlow = true;
 	
 	@Test
 	public void day01() throws Exception {

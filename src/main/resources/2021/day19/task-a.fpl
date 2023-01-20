@@ -58,4 +58,73 @@
 	)
 )
 
-(println (dict-get scanner-dict 0))
+;(println (dict-get scanner-dict 0))
+
+(def-function compare-coords (a b)
+	(match-put (xa ya za) a)
+	(match-put (xb yb zb) b)
+	(cond
+		(lt xa xb) -1
+		(gt xa xb) 1
+		(lt ya yb) -1
+		(gt ya yb) 1
+		(lt za zb) -1
+		(gt za zb) 1
+		0
+	)
+)
+
+; directions:
+; right:	+x
+; up:		+y
+; front:	+z
+
+(def transformations
+	(list 
+		; +x right
+		(lambda (c) (match-put (x y z) c) (list x y z))
+		(lambda (c) (match-put (x y z) c) (list x y z))
+		(lambda (c) (match-put (x y z) c) (list x y z))
+		(lambda (c) (match-put (x y z) c) (list x y z))
+		; +x left
+		(lambda (c) (match-put (x y z) c) (list (- x) (- y) z))
+		(lambda (c) (match-put (x y z) c) (list (- x) (- y) z))
+		(lambda (c) (match-put (x y z) c) (list (- x) (- y) z))
+		(lambda (c) (match-put (x y z) c) (list (- x) (- y) z))
+		; +x up
+		(lambda (c) (match-put (x y z) c) (list (- y) x z))
+		(lambda (c) (match-put (x y z) c) (list (- y) x z))
+		(lambda (c) (match-put (x y z) c) (list (- y) x z))
+		(lambda (c) (match-put (x y z) c) (list (- y) x z))
+		; +x down
+		(lambda (c) (match-put (x y z) c) (list y (- x) z))
+		(lambda (c) (match-put (x y z) c) (list y (- x) z))
+		(lambda (c) (match-put (x y z) c) (list y (- x) z))
+		(lambda (c) (match-put (x y z) c) (list y (- x) z))
+		; +x front
+		(lambda (c) (match-put (x y z) c) (list (- z) y x))
+		(lambda (c) (match-put (x y z) c) (list (- z) y x))
+		(lambda (c) (match-put (x y z) c) (list (- z) y x))
+		(lambda (c) (match-put (x y z) c) (list (- z) y x))
+		; +x back
+		(lambda (c) (match-put (x y z) c) (list z y (- x)))
+		(lambda (c) (match-put (x y z) c) (list z y (- x)))
+		(lambda (c) (match-put (x y z) c) (list z y (- x)))
+		(lambda (c) (match-put (x y z) c) (list z y (- x)))
+	)
+)
+
+(def-function diff-coords (a b)
+	(match-put (ax ay az) a)
+	(match-put (bx by bz) b)
+	(list (- ax bx) (- ay by) (- az bz))
+)
+
+(def-function add-coords (a b)
+	(match-put (ax ay az) a)
+	(match-put (bx by bz) b)
+	(list (+ ax bx) (+ ay by) (+ az bz))
+)
+
+;((get-element transformations 2) '(1 2 3))
+
